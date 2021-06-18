@@ -21,9 +21,10 @@ namespace Calypso.Api.Controllers
             _feedbackImageRepository = feedbackImageRepository;
         }
         [HttpGet]
-        public IActionResult GetAll()
+        public async Task<IActionResult> GetPaged([FromQuery] int pageNumber, [FromQuery] int itemsPerPage)
         {
-            return Ok();
+            var feedbacks = await _feedbackRepository.GetAsync(pageNumber, itemsPerPage);
+            return Ok(feedbacks);
         }
 
         [HttpGet]

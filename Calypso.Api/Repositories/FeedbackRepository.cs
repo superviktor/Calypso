@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Calypso.Api.Common;
 using Calypso.Api.Models;
 using Microsoft.Extensions.Options;
@@ -17,9 +15,9 @@ namespace Calypso.Api.Repositories
 
         public string PartitionKey => "Feedback";
 
-        public Task<IEnumerable<Feedback>> GetAllAsync()
+        public Task<PagedResult<Feedback>> GetAsync(int pageNumber, int itemsPerPage)
         {
-            throw new NotImplementedException();
+            return GetEntitiesAsync(pageNumber, itemsPerPage);
         }
 
         public Task<Feedback> GetAsync(string rowKey)

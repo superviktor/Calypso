@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System.Linq;
+using System.Threading.Tasks;
 using Azure;
 using Azure.Data.Tables;
 using Microsoft.Extensions.Options;
@@ -36,6 +37,20 @@ namespace Calypso.Api.Common
         {
             var response = await _tableClient.GetEntityAsync<T>(partitionKey, rowKey);
             return response.Value;
+        }
+
+        protected Task<PagedResult<T>> GetEntitiesAsync(int pageNumber, int itemsPerPage)
+        {
+            var items = _tableClient.Query<T>(string.Empty)
+                .Skip((pageNumber -1) * itemsPerPage)
+                .Take(itemsPerPage);
+            return Task.FromResult(new PagedResult<T>
+            {
+                PageNumber = pageNumber,
+                ItemsPerPage = itemsPerPage,
+                TotalItems = _tableClient.Query<T>(string.Empty).Count(),
+                Items = items
+            });
         }
     }
 }
