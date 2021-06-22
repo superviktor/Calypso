@@ -10,7 +10,7 @@ services:
     - "10002:10002"
   restart: always
  api:
-  container_name: calypos-api
-  build: .
+  container_name: calypso
+  build: /
   ports:
-  - 8080:5000
+   - "8080:5000"
