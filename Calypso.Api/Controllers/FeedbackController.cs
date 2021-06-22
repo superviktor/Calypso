@@ -43,22 +43,45 @@ namespace Calypso.Api.Controllers
             feedback.PartitionKey = _feedbackRepository.PartitionKey;
 
             var fileName = Guid.NewGuid().ToString();
-            await _feedbackImageRepository.UploadImageAsync(fileName,  await req.File.ToStreamAsync());
-            feedback.FileName = fileName; 
+            await _feedbackImageRepository.UploadImageAsync(fileName, await req.File.ToStreamAsync());
+            feedback.FileName = fileName;
 
             await _feedbackRepository.CreateAsync(feedback);
             return Created("", feedback);
         }
 
         [HttpPut]
-        public IActionResult Update()
+        public async Task<IActionResult> Update([FromForm] UpdateFeedback req)
         {
+            var feedback = await _feedbackRepository.GetAsync(req.RowKey);
+            feedback.Subject = req.Subject;
+            feedback.Date = req.Date;
+            feedback.Factory = req.Factory;
+            feedback.Location = req.Location;
+            feedback.Machine = req.Machine;
+            feedback.ProductName = req.ProductName;
+            feedback.ProjectName = req.ProjectName;
+            feedback.Reporter = req.Reporter;
+            feedback.Role = req.Role;
+            feedback.Sbu = req.Sbu;
+            //delete existing file
+            await _feedbackImageRepository.DeleteImageAsync(feedback.FileName);
+            //add new file
+            var fileName = Guid.NewGuid().ToString();
+            await _feedbackImageRepository.UploadImageAsync(fileName, await req.File.ToStreamAsync());
+            feedback.FileName = fileName;
+
+            await _feedbackRepository.UpdateAsync(feedback);
             return NoContent();
         }
 
         [HttpDelete]
-        public IActionResult Delete()
+        [Route("{rowKey}")]
+        public async Task<IActionResult> Delete(string rowKey)
         {
+            var feedback = await _feedbackRepository.GetAsync(rowKey);
+            await _feedbackRepository.DeleteAsync(feedback);
+            await _feedbackImageRepository.DeleteImageAsync(feedback.FileName);
             return NoContent();
         }
     }

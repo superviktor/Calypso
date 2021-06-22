@@ -22,5 +22,10 @@ namespace Calypso.Api.Repositories
         {
             return DownloadAsync(name);
         }
+
+        public Task DeleteImageAsync(string name)
+        {
+            return DeleteAsync(name);
+        }
     }
 }

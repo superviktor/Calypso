@@ -11,6 +11,6 @@ namespace Calypso.Api.Repositories
         Task<Feedback> GetAsync(string rowKey);
         Task CreateAsync(Feedback feedback);
         Task UpdateAsync(Feedback feedback);
-        Task DeleteAsync(Feedback id);
+        Task DeleteAsync(Feedback feedback);
     }
 }

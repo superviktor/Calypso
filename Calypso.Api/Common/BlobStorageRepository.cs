@@ -28,5 +28,11 @@ namespace Calypso.Api.Common
             var blobClient = _blobContainerClient.GetBlobClient(name);
             return (await blobClient.DownloadAsync()).Value.Content;
         }
+
+        protected async Task DeleteAsync(string name)
+        {
+            var blobClient = _blobContainerClient.GetBlobClient(name);
+            await blobClient.DeleteAsync();
+        }
     }
 }
