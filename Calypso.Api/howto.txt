@@ -1,0 +1,3 @@
+﻿#Tunnel with nrok
+ngrok http http://localhost:5000 -host-header="localhost:5000"
+ngrok http https://localhost:5001 -host-header="localhost:5001"
