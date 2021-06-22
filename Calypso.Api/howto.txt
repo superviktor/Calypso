@@ -1,3 +1,10 @@
 ﻿#Tunnel with nrok
 ngrok http http://localhost:5000 -host-header="localhost:5000"
 ngrok http https://localhost:5001 -host-header="localhost:5001"
+
+#Run azurite 
+docker-compose up
+
+#Run api in docker
+docker build -t calypso-api .
+docker run -d -p 8080:5000 --name calypso calypso-api
