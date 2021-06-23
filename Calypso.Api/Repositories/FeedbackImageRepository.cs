@@ -5,7 +5,7 @@ using Microsoft.Extensions.Options;
 
 namespace Calypso.Api.Repositories
 {
-    public class FeedbackImageRepository: BlobStorageRepository, IFeedbackImageRepository
+    public sealed class FeedbackImageRepository: BlobStorageRepository, IFeedbackImageRepository
     {
         public FeedbackImageRepository(IOptions<AzureStorageOptions> options) : base(options)
         {

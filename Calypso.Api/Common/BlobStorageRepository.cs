@@ -13,8 +13,9 @@ namespace Calypso.Api.Common
         protected BlobStorageRepository(IOptions<AzureStorageOptions> options)
         {
             var blobServiceClient = new BlobServiceClient(options.Value.ConnectionString);
-            _blobContainerClient = 
-                blobServiceClient.GetBlobContainerClient(ContainerName()) ?? blobServiceClient.CreateBlobContainer(ContainerName());
+            _blobContainerClient = blobServiceClient.GetBlobContainerClient(ContainerName());
+            if (!_blobContainerClient.Exists())
+                _blobContainerClient.Create();
         }
 
         protected Task UploadAsync(string name, Stream content)
