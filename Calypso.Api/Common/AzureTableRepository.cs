@@ -6,14 +6,23 @@ using Microsoft.Extensions.Options;
 
 namespace Calypso.Api.Common
 {
-    public abstract class AzureTableRepository<T> where T : class, ITableEntity, new()
+    public abstract class AzureTableRepository<T>: RepositoryBase where T : class, ITableEntity, new()
     {
         public abstract string TableName();
 
         private readonly TableClient _tableClient;
         protected AzureTableRepository(IOptions<AzureStorageOptions> options)
         {
-            var tableServiceClient = new TableServiceClient(options.Value.ConnectionString);
+            var tableServiceClient = new TableServiceClient(options.Value.ConnectionString, new TableClientOptions
+            {
+                Retry =
+                {
+                    Delay = Delay,
+                    MaxRetries = MaxRetries,
+                    Mode = Mode,
+                    MaxDelay = MaxDelay
+                }
+            });
             _ = tableServiceClient.CreateTableIfNotExists(TableName());
             _tableClient = new TableClient(options.Value.ConnectionString, TableName());
         }

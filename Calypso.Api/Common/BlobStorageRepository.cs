@@ -5,14 +5,22 @@ using Microsoft.Extensions.Options;
 
 namespace Calypso.Api.Common
 {
-    public abstract class BlobStorageRepository
+    public abstract class BlobStorageRepository : RepositoryBase
     {
         public abstract string ContainerName();
 
         private readonly BlobContainerClient _blobContainerClient;
         protected BlobStorageRepository(IOptions<AzureStorageOptions> options)
         {
-            var blobServiceClient = new BlobServiceClient(options.Value.ConnectionString);
+            var blobServiceClient = new BlobServiceClient(options.Value.ConnectionString, new BlobClientOptions
+            {
+                Retry = {
+                    Delay = Delay,     
+                    MaxRetries = MaxRetries,                      
+                    Mode = Mode,        
+                    MaxDelay = MaxDelay
+                }
+            });
             _blobContainerClient = blobServiceClient.GetBlobContainerClient(ContainerName());
             if (!_blobContainerClient.Exists())
                 _blobContainerClient.Create();
