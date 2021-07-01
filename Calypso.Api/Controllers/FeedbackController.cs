@@ -70,7 +70,8 @@ namespace Calypso.Api.Controllers
             await _graphServiceClient.Planner.Tasks.Request().AddAsync(new PlannerTask
             {
                 PlanId = plannerOptions.Value.PlanId,
-                Title = "from backend"
+                Title = "from backend",
+                Assignments = new PlannerAssignments()
             });
 
             return Created("", feedback);
