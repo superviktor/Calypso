@@ -1,10 +1,15 @@
 ﻿using System;
 using System.Threading.Tasks;
 using Calypso.Api.Common;
+using Calypso.Api.Config;
 using Calypso.Api.Dtos;
 using Calypso.Api.Models;
 using Calypso.Api.Repositories;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
+using Microsoft.Graph;
+using Microsoft.Graph.Auth;
+using Microsoft.Identity.Client;
 
 namespace Calypso.Api.Controllers
 {
@@ -14,9 +19,22 @@ namespace Calypso.Api.Controllers
     {
         private readonly IFeedbackRepository _feedbackRepository;
         private readonly IFeedbackImageRepository _feedbackImageRepository;
+        private readonly GraphServiceClient _graphServiceClient;
 
-        public FeedbackController(IFeedbackRepository feedbackRepository, IFeedbackImageRepository feedbackImageRepository)
+        public FeedbackController(
+            IFeedbackRepository feedbackRepository,
+            IFeedbackImageRepository feedbackImageRepository,
+            IOptions<AzureAdOptions> azureAdOptions)
         {
+            var confidentialClientApplication = ConfidentialClientApplicationBuilder
+                .Create(azureAdOptions.Value.ClientId)
+                .WithTenantId(azureAdOptions.Value.TenantId)
+                .WithClientSecret(azureAdOptions.Value.ClientSecret)
+                .Build();
+
+            var authProvider = new AuthorizationCodeProvider(confidentialClientApplication);
+            _graphServiceClient = new GraphServiceClient(authProvider);
+
             _feedbackRepository = feedbackRepository;
             _feedbackImageRepository = feedbackImageRepository;
         }
@@ -36,7 +54,8 @@ namespace Calypso.Api.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create([FromForm] CreateFeedback req)
+        public async Task<IActionResult> Create([FromForm] CreateFeedback req, 
+            [FromServices] IOptions<PlannerOptions> plannerOptions)
         {
             var feedback = req.Map<Feedback>();
             feedback.RowKey = Guid.NewGuid().ToString();
@@ -47,6 +66,13 @@ namespace Calypso.Api.Controllers
             feedback.FileName = fileName;
 
             await _feedbackRepository.CreateAsync(feedback);
+
+            await _graphServiceClient.Planner.Tasks.Request().AddAsync(new PlannerTask
+            {
+                PlanId = plannerOptions.Value.PlanId,
+                Title = "from backend"
+            });
+
             return Created("", feedback);
         }
 

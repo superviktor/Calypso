@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
 using Calypso.Api.Common;
+using Calypso.Api.Config;
 using Calypso.Api.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Identity.Web;
@@ -36,6 +37,11 @@ namespace Calypso.Api
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddMicrosoftIdentityWebApi(Configuration, "AzureAd");
+
+            services.Configure<AzureAdOptions>(Configuration.GetSection(
+                AzureAdOptions.AzureAd));
+            services.Configure<PlannerOptions>(Configuration.GetSection(
+                PlannerOptions.Planner));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
