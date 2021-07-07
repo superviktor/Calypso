@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Net;
 using System.Threading.Tasks;
 using Calypso.Api.Common;
 using Calypso.Api.Config;
 using Calypso.Api.Dtos;
 using Calypso.Api.Models;
 using Calypso.Api.Repositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.Graph;
@@ -13,6 +15,7 @@ using Microsoft.Identity.Client;
 
 namespace Calypso.Api.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class FeedbackController : ControllerBase
@@ -31,16 +34,28 @@ namespace Calypso.Api.Controllers
                 .WithTenantId(azureAdOptions.Value.TenantId)
                 .WithClientSecret(azureAdOptions.Value.ClientSecret)
                 .Build();
-
-            var authProvider = new AuthorizationCodeProvider(confidentialClientApplication);
+            var authProvider = new ClientCredentialProvider(confidentialClientApplication);
             _graphServiceClient = new GraphServiceClient(authProvider);
 
             _feedbackRepository = feedbackRepository;
             _feedbackImageRepository = feedbackImageRepository;
         }
         [HttpGet]
-        public async Task<IActionResult> GetPaged([FromQuery] int pageNumber, [FromQuery] int itemsPerPage)
+        public async Task<IActionResult> GetPaged([FromQuery] int pageNumber, [FromQuery] int itemsPerPage, [FromServices] IOptions<PlannerOptions> plannerOptions)
         {
+            //var creds = new NetworkCredential("viktor.prykhidko@softwarium.net", "Ninewa36wolo&");
+
+            //var tasks = await _graphServiceClient.Planner.Plans["vfhep1e-SEirX07WfbLr0JcAFN0-"].Tasks
+            //    .Request()
+            //    .GetAsync();
+            //await _graphServiceClient.Planner.Tasks.Request()
+            //    //.WithUsernamePassword(creds.UserName, creds.SecurePassword)
+            //    .AddAsync(new PlannerTask
+            //    {
+            //        PlanId = plannerOptions.Value.PlanId,
+            //        Title = "from backend",
+            //        Assignments = new PlannerAssignments()
+            //    });
             var feedbacks = await _feedbackRepository.GetAsync(pageNumber, itemsPerPage);
             return Ok(feedbacks);
         }
