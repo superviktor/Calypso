@@ -22,16 +22,16 @@ namespace Calypso.Api.Repositories
 
             var filtered = !string.IsNullOrWhiteSpace(searchString) 
                 ? feedbacks.Where(x => 
-                    x.Subject.Contains(searchString) &&
-                    x.ProjectName.Contains(searchString) &&
-                    x.Factory.ToString().Contains(searchString) &&
-                    x.Location.Contains(searchString) &&
-                    x.Machine.Contains(searchString) &&
-                    x.ProductName.Contains(searchString) &&
-                    x.Reporter.Contains(searchString) &&
-                    x.Sbu.Contains(searchString) &&
-                    x.Role.Contains(searchString)
-                    ).ToList() 
+                    (!string.IsNullOrWhiteSpace(x.Subject) && x.Subject.Contains(searchString)) ||
+                    (!string.IsNullOrWhiteSpace(x.ProjectName) && x.ProjectName.Contains(searchString)) ||
+                    (!string.IsNullOrWhiteSpace(x.Factory.ToString()) && x.Factory.ToString().Contains(searchString)) ||
+                    (!string.IsNullOrWhiteSpace(x.Location) && x.Location.Contains(searchString)) ||
+                    (!string.IsNullOrWhiteSpace(x.Machine) && x.Machine.Contains(searchString)) ||
+                    (!string.IsNullOrWhiteSpace(x.ProductName) && x.ProductName.Contains(searchString)) ||
+                    (!string.IsNullOrWhiteSpace(x.Reporter) && x.Reporter.Contains(searchString)) ||
+                    (!string.IsNullOrWhiteSpace(x.Sbu) && x.Sbu.Contains(searchString)) ||
+                    (!string.IsNullOrWhiteSpace(x.Role) && x.Role.Contains(searchString)) 
+                ).ToList() 
                 : feedbacks;
 
             var pagedItems = filtered

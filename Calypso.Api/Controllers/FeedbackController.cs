@@ -86,12 +86,12 @@ namespace Calypso.Api.Controllers
 
             await _feedbackRepository.CreateAsync(feedback);
 
-            await _graphServiceClient.Planner.Tasks.Request().AddAsync(new PlannerTask
-            {
-                PlanId = plannerOptions.Value.PlanId,
-                Title = "from backend",
-                Assignments = new PlannerAssignments()
-            });
+            //await _graphServiceClient.Planner.Tasks.Request().AddAsync(new PlannerTask
+            //{
+            //    PlanId = plannerOptions.Value.PlanId,
+            //    Title = "from backend",
+            //    Assignments = new PlannerAssignments()
+            //});
 
             return Created("", feedback);
         }
