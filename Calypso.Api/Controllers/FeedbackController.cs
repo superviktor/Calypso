@@ -15,7 +15,7 @@ using Microsoft.Identity.Client;
 
 namespace Calypso.Api.Controllers
 {
-    //[Authorize]
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class FeedbackController : ControllerBase
