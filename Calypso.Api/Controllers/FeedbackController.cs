@@ -15,7 +15,7 @@ using Microsoft.Identity.Client;
 
 namespace Calypso.Api.Controllers
 {
-    [Authorize]
+    //[Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class FeedbackController : ControllerBase
@@ -41,7 +41,11 @@ namespace Calypso.Api.Controllers
             _feedbackImageRepository = feedbackImageRepository;
         }
         [HttpGet]
-        public async Task<IActionResult> GetPaged([FromQuery] int pageNumber, [FromQuery] int itemsPerPage, [FromServices] IOptions<PlannerOptions> plannerOptions)
+        public async Task<IActionResult> GetPaged(
+            [FromQuery] int pageNumber, 
+            [FromQuery] int itemsPerPage, 
+            [FromServices] IOptions<PlannerOptions> plannerOptions, 
+            [FromQuery] string searchString = null)
         {
             //var creds = new NetworkCredential("viktor.prykhidko@softwarium.net", "Ninewa36wolo&");
 
@@ -56,7 +60,7 @@ namespace Calypso.Api.Controllers
             //        Title = "from backend",
             //        Assignments = new PlannerAssignments()
             //    });
-            var feedbacks = await _feedbackRepository.GetAsync(pageNumber, itemsPerPage);
+            var feedbacks = await _feedbackRepository.GetAsync(pageNumber, itemsPerPage, searchString);
             return Ok(feedbacks);
         }
 
