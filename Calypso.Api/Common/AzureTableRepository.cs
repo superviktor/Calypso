@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Azure;
@@ -45,8 +46,17 @@ namespace Calypso.Api.Common
 
         protected async Task<T> GetEntityAsync(string partitionKey, string rowKey)
         {
-            var response = await _tableClient.GetEntityAsync<T>(partitionKey, rowKey);
-            return response.Value;
+            T result;
+            try
+            {
+                result = await _tableClient.GetEntityAsync<T>(partitionKey, rowKey);
+            }
+            catch (RequestFailedException e)
+            {
+                result = null;
+            }
+
+            return result;
         }
 
         protected Task<List<T>> GetEntitiesAsync()

@@ -42,9 +42,9 @@ namespace Calypso.Api.Controllers
         }
         [HttpGet]
         public async Task<IActionResult> GetPaged(
-            [FromQuery] int pageNumber, 
-            [FromQuery] int itemsPerPage, 
-            [FromServices] IOptions<PlannerOptions> plannerOptions, 
+            [FromServices] IOptions<PlannerOptions> plannerOptions,
+            [FromQuery] int pageNumber = 1,
+            [FromQuery] int itemsPerPage = 10,
             [FromQuery] string searchString = null)
         {
             //var creds = new NetworkCredential("viktor.prykhidko@softwarium.net", "Ninewa36wolo&");
@@ -69,6 +69,10 @@ namespace Calypso.Api.Controllers
         public async Task<IActionResult> Get(string rowKey)
         {
             var feedback = await _feedbackRepository.GetAsync(rowKey);
+
+            if (feedback == null)
+                return NotFound();
+
             return Ok(feedback.Map<FeedbackDto>());
         }
 
@@ -100,6 +104,9 @@ namespace Calypso.Api.Controllers
         public async Task<IActionResult> Update([FromForm] UpdateFeedback req)
         {
             var feedback = await _feedbackRepository.GetAsync(req.RowKey);
+            if (feedback == null)
+                return NotFound();
+
             feedback.Subject = req.Subject;
             feedback.Date = req.Date;
             feedback.Factory = req.Factory;
@@ -126,6 +133,8 @@ namespace Calypso.Api.Controllers
         public async Task<IActionResult> Delete(string rowKey)
         {
             var feedback = await _feedbackRepository.GetAsync(rowKey);
+            if (feedback == null)
+                return NotFound();
             await _feedbackRepository.DeleteAsync(feedback);
             await _feedbackImageRepository.DeleteImageAsync(feedback.FileName);
             return NoContent();
