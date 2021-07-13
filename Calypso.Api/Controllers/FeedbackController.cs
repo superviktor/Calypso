@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Threading.Tasks;
 using Calypso.Api.Common;
@@ -22,23 +23,16 @@ namespace Calypso.Api.Controllers
     {
         private readonly IFeedbackRepository _feedbackRepository;
         private readonly IFeedbackImageRepository _feedbackImageRepository;
-        private readonly GraphServiceClient _graphServiceClient;
+        private readonly IOptions<AzureAdOptions> _azureAdOptions;
 
         public FeedbackController(
             IFeedbackRepository feedbackRepository,
             IFeedbackImageRepository feedbackImageRepository,
             IOptions<AzureAdOptions> azureAdOptions)
         {
-            var confidentialClientApplication = ConfidentialClientApplicationBuilder
-                .Create(azureAdOptions.Value.ClientId)
-                .WithTenantId(azureAdOptions.Value.TenantId)
-                .WithClientSecret(azureAdOptions.Value.ClientSecret)
-                .Build();
-            var authProvider = new ClientCredentialProvider(confidentialClientApplication);
-            _graphServiceClient = new GraphServiceClient(authProvider);
-
             _feedbackRepository = feedbackRepository;
             _feedbackImageRepository = feedbackImageRepository;
+            _azureAdOptions = azureAdOptions;
         }
         [HttpGet]
         public async Task<IActionResult> GetPaged(
@@ -47,13 +41,20 @@ namespace Calypso.Api.Controllers
             [FromQuery] int itemsPerPage = 10,
             [FromQuery] string searchString = null)
         {
-            //var creds = new NetworkCredential("viktor.prykhidko@softwarium.net", "Ninewa36wolo&");
-
-            //var tasks = await _graphServiceClient.Planner.Plans["vfhep1e-SEirX07WfbLr0JcAFN0-"].Tasks
-            //    .Request()
-            //    .GetAsync();
-            //await _graphServiceClient.Planner.Tasks.Request()
-            //    //.WithUsernamePassword(creds.UserName, creds.SecurePassword)
+            //var token = HttpContext.Request.Headers["Authorization"].ToString()["Bearer ".Length..].Trim();
+            //var confidentialClientApplication = ConfidentialClientApplicationBuilder
+            //    .Create(_azureAdOptions.Value.ClientId)
+            //    .WithTenantId(_azureAdOptions.Value.TenantId)
+            //    .WithClientSecret(_azureAdOptions.Value.ClientSecret)
+            //    .Build();
+            //var enumerable = new List<string>
+            //{
+            //    "https://graph.microsoft.com/user.read"
+            //};
+            //var authProvider = new OnBehalfOfProvider(confidentialClientApplication, enumerable);
+            //authProvider.ClientApplication.AcquireTokenOnBehalfOf(enumerable, new UserAssertion(token));
+            //var graphServiceClient = new GraphServiceClient(authProvider);
+            //await graphServiceClient.Planner.Tasks.Request()
             //    .AddAsync(new PlannerTask
             //    {
             //        PlanId = plannerOptions.Value.PlanId,
@@ -83,20 +84,13 @@ namespace Calypso.Api.Controllers
             var feedback = req.Map<Feedback>();
             feedback.RowKey = Guid.NewGuid().ToString();
             feedback.PartitionKey = _feedbackRepository.PartitionKey;
-
-            var fileName = Guid.NewGuid().ToString();
-            await _feedbackImageRepository.UploadImageAsync(fileName, await req.File.ToStreamAsync());
-            feedback.FileName = fileName;
-
+            if (req.File != null)
+            {
+                var fileName = Guid.NewGuid().ToString();
+                await _feedbackImageRepository.UploadImageAsync(fileName, await req.File.ToStreamAsync());
+                feedback.FileName = fileName;
+            }
             await _feedbackRepository.CreateAsync(feedback);
-
-            //await _graphServiceClient.Planner.Tasks.Request().AddAsync(new PlannerTask
-            //{
-            //    PlanId = plannerOptions.Value.PlanId,
-            //    Title = "from backend",
-            //    Assignments = new PlannerAssignments()
-            //});
-
             return Created("", feedback);
         }
 
@@ -117,12 +111,15 @@ namespace Calypso.Api.Controllers
             feedback.Reporter = req.Reporter;
             feedback.Role = req.Role;
             feedback.Sbu = req.Sbu;
-            //delete existing file
-            await _feedbackImageRepository.DeleteImageAsync(feedback.FileName);
-            //add new file
-            var fileName = Guid.NewGuid().ToString();
-            await _feedbackImageRepository.UploadImageAsync(fileName, await req.File.ToStreamAsync());
-            feedback.FileName = fileName;
+            if (req.File != null)
+            {
+                //delete existing file
+                await _feedbackImageRepository.DeleteImageAsync(feedback.FileName);
+                //add new file
+                var fileName = Guid.NewGuid().ToString();
+                await _feedbackImageRepository.UploadImageAsync(fileName, await req.File.ToStreamAsync());
+                feedback.FileName = fileName;
+            }
 
             await _feedbackRepository.UpdateAsync(feedback);
             return NoContent();
@@ -136,7 +133,8 @@ namespace Calypso.Api.Controllers
             if (feedback == null)
                 return NotFound();
             await _feedbackRepository.DeleteAsync(feedback);
-            await _feedbackImageRepository.DeleteImageAsync(feedback.FileName);
+            if(feedback.FileName != null)
+                await _feedbackImageRepository.DeleteImageAsync(feedback.FileName);
             return NoContent();
         }
     }

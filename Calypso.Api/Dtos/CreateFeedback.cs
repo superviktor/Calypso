@@ -28,7 +28,6 @@ namespace Calypso.Api.Dtos
         public string ProductName { get; set; }
         [Required]
         public Factory Factory { get; set; }
-        [Required]
         public IFormFile File { get; set; }
     }
 }
