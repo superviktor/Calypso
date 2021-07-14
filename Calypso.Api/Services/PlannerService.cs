@@ -10,7 +10,7 @@ namespace Calypso.Api.Services
 {
     public class PlannerService : IPlannerService
     {
-        private const string PlannerScope = "https://graph.microsoft.com/Group.ReadWrite.All";
+        private const string PlannerScope = "https://graph.microsoft.com/Tasks.ReadWrite";
         private const string UserAssertionType = "urn:ietf:params:oauth:grant-type:jwt-bearer";
 
         private readonly IOptions<AzureAdOptions> _azureAdOptions;

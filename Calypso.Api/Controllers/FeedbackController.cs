@@ -37,7 +37,6 @@ namespace Calypso.Api.Controllers
             [FromQuery] int itemsPerPage = 10,
             [FromQuery] string searchString = null)
         {
-            await _plannerService.CreateTask(HttpContext.Request.Headers.GetAuthorizationHeaderValue(), "from backend");
             var feedbacks = await _feedbackRepository.GetAsync(pageNumber, itemsPerPage, searchString);
             return Ok(feedbacks);
         }
@@ -68,6 +67,7 @@ namespace Calypso.Api.Controllers
                 feedback.FileName = fileName;
             }
             await _feedbackRepository.CreateAsync(feedback);
+            await _plannerService.CreateTask(HttpContext.Request.Headers.GetAuthorizationHeaderValue(), feedback.Subject);
             return Created("", feedback);
         }
 
