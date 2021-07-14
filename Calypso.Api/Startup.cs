@@ -7,6 +7,7 @@ using Microsoft.OpenApi.Models;
 using Calypso.Api.Common;
 using Calypso.Api.Config;
 using Calypso.Api.Repositories;
+using Calypso.Api.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.Identity.Web;
 
@@ -24,6 +25,16 @@ namespace Calypso.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddCors(o =>
+            {
+                o.AddDefaultPolicy(
+                    builder =>
+                    {
+                        builder.WithOrigins("http://localhost:3000")
+                            .AllowAnyHeader()
+                            .AllowAnyMethod();
+                    });
+            });
             services.AddControllers().AddJsonOptions(options =>
                 options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter())); ;
             services.AddSwaggerGen(c =>
@@ -61,6 +72,7 @@ namespace Calypso.Api
             services.Configure<AzureStorageOptions>(azureStorageSection);
             services.AddScoped<IFeedbackRepository, FeedbackRepository>();
             services.AddScoped<IFeedbackImageRepository, FeedbackImageRepository>();
+            services.AddScoped<IPlannerService, PlannerService>();
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddMicrosoftIdentityWebApi(Configuration, "AzureAd");
@@ -80,6 +92,8 @@ namespace Calypso.Api
             app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "Calypso.Api v1"));
 
             app.UseRouting();
+
+            app.UseCors();
 
             app.UseAuthentication();
             app.UseAuthorization();
