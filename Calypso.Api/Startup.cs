@@ -30,7 +30,7 @@ namespace Calypso.Api
                 o.AddDefaultPolicy(
                     builder =>
                     {
-                        builder.WithOrigins("http://localhost:3000")
+                        builder.WithOrigins("http://localhost:3000", "http://localhost:5002", "https://localhost:5003")
                             .AllowAnyHeader()
                             .AllowAnyMethod();
                     });

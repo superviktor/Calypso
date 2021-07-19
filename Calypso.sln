@@ -3,7 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.31313.79
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Calypso.Api", "Calypso.Api\Calypso.Api.csproj", "{BCF5D739-F8CE-45B7-BEA7-416D547BEBAA}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Calypso.Api", "Calypso.Api\Calypso.Api.csproj", "{BCF5D739-F8CE-45B7-BEA7-416D547BEBAA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Calypso.Web", "Calypso.Web\Calypso.Web.csproj", "{CD8F5418-A4C3-4315-B23C-F7DE20C51A2A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Calypso.Console", "Calypso.Console\Calypso.Console.csproj", "{8CDF3F26-3A85-494E-BF1A-EB44409CA30B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +19,14 @@ Global
 		{BCF5D739-F8CE-45B7-BEA7-416D547BEBAA}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BCF5D739-F8CE-45B7-BEA7-416D547BEBAA}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BCF5D739-F8CE-45B7-BEA7-416D547BEBAA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CD8F5418-A4C3-4315-B23C-F7DE20C51A2A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CD8F5418-A4C3-4315-B23C-F7DE20C51A2A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CD8F5418-A4C3-4315-B23C-F7DE20C51A2A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CD8F5418-A4C3-4315-B23C-F7DE20C51A2A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8CDF3F26-3A85-494E-BF1A-EB44409CA30B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8CDF3F26-3A85-494E-BF1A-EB44409CA30B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8CDF3F26-3A85-494E-BF1A-EB44409CA30B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8CDF3F26-3A85-494E-BF1A-EB44409CA30B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
