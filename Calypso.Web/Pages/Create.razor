@@ -1,0 +1,24 @@
+﻿@page "/create"
+
+<h1>Create feedback</h1>
+
+<form action="http://localhost:5000/api/Feedback" method="post" enctype="multipart/form-data">
+    <p>Subject <input type="text" name="Subject" value="new-feedback-0"></p>
+    <p>Machine <input type="text" name="Machine" value="new-feedback-0"></p>
+    <p>Location <input type="text" name="Location" value="new-feedback-0"></p>
+    <p>Reporter <input type="text" name="Reporter" value="new-feedback-0"></p>
+    <p>Role <input type="text" name="Role" value="new-feedback-0"></p>
+    <p>Date <input type="date" name="Date" value="2021-08-11"></p>
+    <p>Sbu <input type="text" name="Sbu" value="new-feedback-0"></p>
+    <p>ProjectName <input type="text" name="ProjectName" value="new-feedback-0"></p>
+    <p>ProductName <input type="text" name="ProductName" value="new-feedback-0"></p>
+    <p>Factory <select name="Factory">
+                   <option value="China">China</option>
+                   <option value="Finland">Finland</option>
+                   <option value="India">India</option>
+                    <option value="Russia">Russia</option>
+                    <option value="Usa">Usa</option>
+    </select></p>
+    <p>File <input type="file" name="File"></p>
+    <button type="submit">Submit</button>
+</form>
