@@ -1,24 +1,127 @@
 ﻿@page "/create"
+@using Calypso.Web.Models
+@using Microsoft.Extensions.Logging
+@using System.Net.Http.Headers
+@using System.IO
+@inject ILogger<CreateFeedback> Logger
+@inject HttpClient Http
+@inject NavigationManager NavManager
 
 <h1>Create feedback</h1>
 
-<form action="http://localhost:5000/api/Feedback" method="post" enctype="multipart/form-data">
-    <p>Subject <input type="text" name="Subject" value="new-feedback-0"></p>
-    <p>Machine <input type="text" name="Machine" value="new-feedback-0"></p>
-    <p>Location <input type="text" name="Location" value="new-feedback-0"></p>
-    <p>Reporter <input type="text" name="Reporter" value="new-feedback-0"></p>
-    <p>Role <input type="text" name="Role" value="new-feedback-0"></p>
-    <p>Date <input type="date" name="Date" value="2021-08-11"></p>
-    <p>Sbu <input type="text" name="Sbu" value="new-feedback-0"></p>
-    <p>ProjectName <input type="text" name="ProjectName" value="new-feedback-0"></p>
-    <p>ProductName <input type="text" name="ProductName" value="new-feedback-0"></p>
-    <p>Factory <select name="Factory">
-                   <option value="China">China</option>
-                   <option value="Finland">Finland</option>
-                   <option value="India">India</option>
-                    <option value="Russia">Russia</option>
-                    <option value="Usa">Usa</option>
-    </select></p>
-    <p>File <input type="file" name="File"></p>
+<EditForm Model="@createFeedback" OnValidSubmit="@HandleValidSubmit">
+    <DataAnnotationsValidator></DataAnnotationsValidator>
+    <ValidationSummary></ValidationSummary>
+    <p>
+        <label>
+            Subject:
+            <InputText @bind-Value="@createFeedback.Subject"></InputText>
+        </label>
+    </p>
+    <p>
+        <label>
+            Machine:
+            <InputText @bind-Value="@createFeedback.Machine"></InputText>
+        </label>
+    </p>
+    <p>
+        <label>
+            Location:
+            <InputText @bind-Value="@createFeedback.Location"></InputText>
+        </label>
+    </p>
+    <p>
+        <label>
+            Reporter:
+            <InputText @bind-Value="@createFeedback.Reporter"></InputText>
+        </label>
+    </p>
+    <p>
+        <label>
+            Role:
+            <InputText @bind-Value="@createFeedback.Role"></InputText>
+        </label>
+    </p>
+    <p>
+        <label>
+            Date:
+            <InputDate @bind-Value="@createFeedback.Date"></InputDate>
+        </label>
+    </p>
+    <p>
+        <label>
+            Sbu:
+            <InputText @bind-Value="@createFeedback.Sbu"></InputText>
+        </label>
+    </p>
+    <p>
+        <label>
+            Project name:
+            <InputText @bind-Value="@createFeedback.ProjectName"></InputText>
+        </label>
+    </p>
+    <p>
+        <label>
+            Product name:
+            <InputText @bind-Value="@createFeedback.ProductName"></InputText>
+        </label>
+    </p>
+    <p>
+        <label>
+            Factory:
+            <select @bind="@createFeedback.Factory">
+                <option value="China">China</option>
+                <option value="Finland">Finland</option>
+                <option value="India">India</option>
+                <option value="Russia">Russia</option>
+                <option value="Usa">Usa</option>
+            </select>
+        </label>
+    </p>
+    <p>
+        <label>
+            File:
+            <InputFile OnChange="@LoadFiles"></InputFile>
+        </label>
+    </p>
     <button type="submit">Submit</button>
-</form>
+</EditForm>
+
+@code
+{
+    private CreateFeedback createFeedback = new();
+
+    private async Task HandleValidSubmit()
+    {
+        using var content = new MultipartFormDataContent
+    {
+            {new StreamContent(new MemoryStream(createFeedback.FileContent)), "File", "fileName"},
+            {new StringContent(createFeedback.Subject), "Subject"},
+            {new StringContent(createFeedback.Machine), "Machine"},
+            {new StringContent(createFeedback.Location), "Location"},
+            {new StringContent(createFeedback.Reporter), "Reporter"},
+            {new StringContent(createFeedback.Role), "Role"},
+            {new StringContent(createFeedback.Date.ToShortDateString()), "Date"},
+            {new StringContent(createFeedback.Sbu), "Sbu"},
+            {new StringContent(createFeedback.ProjectName), "ProjectName"},
+            {new StringContent(createFeedback.ProductName), "ProductName"},
+            {new StringContent(createFeedback.Factory), "Factory"}
+        };
+
+        Http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6Im5PbzNaRHJPRFhFSzFqS1doWHNsSFJfS1hFZyIsImtpZCI6Im5PbzNaRHJPRFhFSzFqS1doWHNsSFJfS1hFZyJ9.eyJhdWQiOiJhcGk6Ly80Y2U0ZGMwMC1jZGMzLTRkZjgtYmNiYy0xNGUxMDA2NzU4YjEiLCJpc3MiOiJodHRwczovL3N0cy53aW5kb3dzLm5ldC9mNGMxODc4OC0xZjZkLTRmMzQtOTdiMS01MGNlODU0MWE2MzcvIiwiaWF0IjoxNjI2NzA4Nzc4LCJuYmYiOjE2MjY3MDg3NzgsImV4cCI6MTYyNjcxMjY3OCwiYWNyIjoiMSIsImFpbyI6IkFTUUEyLzhUQUFBQVpxSlBCSDI5Y25lWFJaTzR0YkFNbUJiWkxuRFZiZXptY002WDNxcEhNVXM9IiwiYW1yIjpbInB3ZCJdLCJhcHBpZCI6IjRjZTRkYzAwLWNkYzMtNGRmOC1iY2JjLTE0ZTEwMDY3NThiMSIsImFwcGlkYWNyIjoiMSIsImZhbWlseV9uYW1lIjoiUHJ5a2hpZGtvIiwiZ2l2ZW5fbmFtZSI6IlZpa3RvciIsImlwYWRkciI6IjkzLjE3MS43OC4yMzgiLCJuYW1lIjoiVmlrdG9yIFByeWtoaWRrbyIsIm9pZCI6IjM3ZGI5MzBhLWJhODEtNGMzNi1hYzMzLTMxYzM1OTViMWUwMyIsInJoIjoiMC5BU0VBaUlmQjlHMGZORS1Yc1ZET2hVR21Od0RjNUV6RHpmaE52THdVNFFCbldMRWhBTEUuIiwic2NwIjoiYWNjZXNzX2FzX3VzZXIiLCJzdWIiOiJXNGFHMUthUVIwY29xZ09Ua0ZUX0hXZjU4UGNRbjVKWkduZ09lYTFPNzdRIiwidGlkIjoiZjRjMTg3ODgtMWY2ZC00ZjM0LTk3YjEtNTBjZTg1NDFhNjM3IiwidW5pcXVlX25hbWUiOiJ2aWt0b3IucHJ5a2hpZGtvQHNvZnR3YXJpdW0ubmV0IiwidXBuIjoidmlrdG9yLnByeWtoaWRrb0Bzb2Z0d2FyaXVtLm5ldCIsInV0aSI6Inh0aFhjTFVrWmthWk1EZWdiRWhxQUEiLCJ2ZXIiOiIxLjAifQ.Nb-KUQDqR8DYnxf-8uxd99Q5lgVSNMubr7OQeS9cW-sIeumQHFz--RyUDkgpQOXAYK5OyXLzBUj13ziGAp1hcBOmM-0ia8YCiSWkd8a6-azO6guD-Bffn6bqyJcKWWWcc48hPue8aQWzNFuoUbB2l-tAcer6-A9ksh0f654WSQPRWWYuorIDl7rnDpQX3RURs-0gg2-dI41Ukq5uZDBbFa5R66aN8nSkJDwvIzREEXWnwcBcUi1AbXko715aTIY9sVSLccIf6BDcUu3EDi929R4CFAdHlQHMwSoJ70sfr67C4oPC-5nv51Z83BV29qtReE-YVQr02qUIZSss0_I5fg");
+        var response = await Http.PostAsync("http://localhost:5000/api/Feedback", content);
+        var responseContent = await response.Content.ReadAsStringAsync();
+        NavManager.NavigateTo("/feedbacks");
+    }
+
+    private async Task LoadFiles(InputFileChangeEventArgs e)
+    {
+        var file = e.GetMultipleFiles().FirstOrDefault();
+        if (file != null)
+        {
+            var buffer = new byte[file.Size];
+            await file.OpenReadStream().ReadAsync(buffer);
+            createFeedback.FileContent = buffer;
+        }
+    }
+}
