@@ -11,39 +11,64 @@
 }
 else
 {
-    <table class="table">
+    <table id="items" class="table">
         <thead>
-            <tr>
-                <th>Subject</th>
-                <th>Machine</th>
-                <th>Location</th>
-                <th>Reporter</th>
-                <th>Role</th>
-                <th>Date</th>
-                <th>Sbu</th>
-                <th>Project name</th>
-                <th>Product name</th>
-                <th>Factory</th>
-            </tr>
+        <tr>
+            <th>Subject</th>
+            <th>Machine</th>
+            <th>Location</th>
+            <th>Reporter</th>
+            <th>Role</th>
+            <th>Date</th>
+            <th>Sbu</th>
+            <th>Project name</th>
+            <th>Product name</th>
+            <th>Factory</th>
+        </tr>
         </thead>
         <tbody>
-            @foreach (var feedback in _feedbacks)
-            {
-                <tr>
-                    <td>@feedback.Subject</td>
-                    <td>@feedback.Machine</td>
-                    <td>@feedback.Location</td>
-                    <td>@feedback.Reporter</td>
-                    <td>@feedback.Role</td>
-                    <td>@feedback.Date</td>
-                    <td>@feedback.Sbu</td>
-                    <td>@feedback.ProjectName</td>
-                    <td>@feedback.ProductName</td>
-                    <td>@feedback.Factory</td>
-                </tr>
-            }
+        @foreach (var feedback in _feedbacks)
+        {
+            <tr>
+                <td>@feedback.Subject</td>
+                <td>@feedback.Machine</td>
+                <td>@feedback.Location</td>
+                <td>@feedback.Reporter</td>
+                <td>@feedback.Role</td>
+                <td>@feedback.Date</td>
+                <td>@feedback.Sbu</td>
+                <td>@feedback.ProjectName</td>
+                <td>@feedback.ProductName</td>
+                <td>@feedback.Factory</td>
+            </tr>
+        }
         </tbody>
     </table>
+
+    <style>
+        #items {
+            font-family: Arial, Helvetica, sans-serif;
+            border-collapse: collapse;
+            width: 100%;
+        }
+
+        #items td, #items th {
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+
+        #items tr:nth-child(even){background-color: #f2f2f2;}
+
+        #items tr:hover {background-color: #ddd;}
+
+        #items th {
+            padding-top: 12px;
+            padding-bottom: 12px;
+            text-align: left;
+            background-color: black;
+            color: white;
+        }
+    </style>
 }
 
 @code {
