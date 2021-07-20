@@ -35,6 +35,7 @@ namespace Calypso.Api.Repositories
                 : feedbacks;
 
             var pagedItems = filtered
+                .OrderByDescending(f=>f.Timestamp)
                 .Skip((pageNumber - 1) * itemsPerPage)
                 .Take(itemsPerPage);
 

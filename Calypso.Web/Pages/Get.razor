@@ -1,0 +1,139 @@
+﻿@page "/feedback/{rowKey}"
+@using Calypso.Web.Models
+@using System.Text.Json
+@using Microsoft.Extensions.Logging
+@inject HttpClient Http
+@inject ILogger<Get> Logger
+
+
+<h1>Details</h1>
+
+@if (_feedback == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table>
+        <tr>
+            <td>
+                <table>
+                    <tr>
+                        <td>
+                            Subject:
+                        </td>
+                        <td>
+                            @_feedback.Subject
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Machine:
+                        </td>
+                        <td>
+                            @_feedback.Machine
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Location:
+                        </td>
+                        <td>
+                            @_feedback.Location
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Reporter:
+                        </td>
+                        <td>
+                            @_feedback.Reporter
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Role:
+                        </td>
+                        <td>
+                            @_feedback.Role
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Date:
+                        </td>
+                        <td>
+                            @_feedback.Date
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Sbu:
+                        </td>
+                        <td>
+                            @_feedback.Sbu
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Project name:
+                        </td>
+                        <td>
+                            @_feedback.ProjectName
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Product name:
+                        </td>
+                        <td>
+                            @_feedback.ProductName
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Factory:
+                        </td>
+                        <td>
+                            @_feedback.Factory
+                        </td>
+                    </tr>
+                </table>
+            </td>
+            <td>
+                <img src="data:image/png;base64, @_image" />
+            </td>
+        </tr>
+    </table>
+
+}
+
+@code {
+    private Feedback _feedback;
+    private string _image;
+
+    [Parameter]
+    public string RowKey { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var requestUri = new Uri($"http://localhost:5000/api/Feedback/{RowKey}");
+        var response = await Http.GetAsync(requestUri);
+        var content = await response.Content.ReadAsStringAsync();
+        var feedback = JsonSerializer.Deserialize<Feedback>(content, new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true
+        });
+        _feedback = feedback;
+        _image = await GetImage(feedback.FileName);
+    }
+
+    private async Task<string> GetImage(string imageId)
+    {
+        var requestUri = new Uri($"http://localhost:5000/api/FeedbackImage/{imageId}");
+        var response = await Http.GetAsync(requestUri);
+        var content = await response.Content.ReadAsByteArrayAsync();
+        var base64String = Convert.ToBase64String(content);
+        return base64String;
+    }
+}
