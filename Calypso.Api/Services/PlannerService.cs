@@ -22,9 +22,34 @@ namespace Calypso.Api.Services
             _plannerOptions = plannerOptions;
         }
 
-        public async Task CreateTask(string authToken, string title)
+        public async Task<string> CreateTask(string authToken, string title)
         {
-            var scopes = new List<string> { PlannerScope };
+            var graphServiceClient = await GetGraphServiceClient(authToken);
+            var task = await graphServiceClient.Planner.Tasks.Request()
+                .AddAsync(new PlannerTask
+                {
+                    PlanId = _plannerOptions.Value.PlanId,
+                    Title = title,
+                    Assignments = new PlannerAssignments()
+                });
+            return task.Id;
+        }
+        public async Task AddTaskDescription(string authToken, string taskId, string description)
+        {
+            var graphServiceClient = await GetGraphServiceClient(authToken);
+            var taskDetails = await graphServiceClient.Planner.Tasks[taskId].Details.Request()
+                .GetAsync();
+            await graphServiceClient.Planner.Tasks[taskId].Details.Request()
+                .Header("If-Match", taskDetails.GetEtag())
+                .UpdateAsync(new PlannerTaskDetails
+                {
+                    Description = description
+                });
+        }
+
+        private async Task<GraphServiceClient> GetGraphServiceClient(string authToken)
+        {
+            var scopes = new List<string> {PlannerScope};
             var userAssertion = new UserAssertion(authToken, UserAssertionType);
             var confidentialClientApplication = ConfidentialClientApplicationBuilder
                 .Create(_azureAdOptions.Value.ClientId)
@@ -34,13 +59,7 @@ namespace Calypso.Api.Services
             var authProvider = new OnBehalfOfProvider(confidentialClientApplication, scopes);
             await authProvider.ClientApplication.AcquireTokenOnBehalfOf(scopes, userAssertion).ExecuteAsync();
             var graphServiceClient = new GraphServiceClient(authProvider);
-            await graphServiceClient.Planner.Tasks.Request()
-                .AddAsync(new PlannerTask
-                {
-                    PlanId = _plannerOptions.Value.PlanId,
-                    Title = title,
-                    Assignments = new PlannerAssignments()
-                });
+            return graphServiceClient;
         }
     }
 }

@@ -67,7 +67,11 @@ namespace Calypso.Api.Controllers
                 feedback.FileName = fileName;
             }
             await _feedbackRepository.CreateAsync(feedback);
-            await _plannerService.CreateTask(HttpContext.Request.Headers.GetAuthorizationHeaderValue(), $"Feedback #{feedback.Number}");
+            var authorizationHeaderValue = HttpContext.Request.Headers.GetAuthorizationHeaderValue();
+            var taskId = await _plannerService.CreateTask(authorizationHeaderValue, $"Feedback #{feedback.Number}");
+            await _plannerService.AddTaskDescription(authorizationHeaderValue,
+                taskId, feedback.Description);
+
             return Created("", feedback);
         }
 
