@@ -16,6 +16,14 @@
     <table>
         <tr>
             <td>
+                <label>Description:</label>
+            </td>
+            <td>
+                <InputText @bind-Value="@createFeedback.Description"></InputText>
+            </td>
+        </tr>
+        <tr>
+            <td>
                 <label>Subject:</label>
             </td>
             <td>
@@ -152,6 +160,7 @@
     {
         using var content = new MultipartFormDataContent
         {
+            {new StringContent(createFeedback.Description), "Description"},
             {new StringContent(createFeedback.Subject), "Subject"},
             {new StringContent(createFeedback.Machine), "Machine"},
             {new StringContent(createFeedback.Location), "Location"},

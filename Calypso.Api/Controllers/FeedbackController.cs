@@ -78,6 +78,7 @@ namespace Calypso.Api.Controllers
             if (feedback == null)
                 return NotFound();
 
+            feedback.Description = req.Description;
             feedback.Subject = req.Subject;
             feedback.Date = req.Date;
             feedback.Factory = req.Factory;

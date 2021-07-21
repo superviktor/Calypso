@@ -8,6 +8,8 @@ namespace Calypso.Api.Dtos
     public class CreateFeedback
     {
         [Required]
+        public string Description { get; set; }
+        [Required]
         public string Subject { get; set; }
         [Required]
         public string Machine { get; set; }
