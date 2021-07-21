@@ -3,6 +3,7 @@
     public class Feedback
     {
         public string RowKey { get; set; }
+        public int Number { get; set; }
         public string Subject { get; set; }
         public string Machine { get; set; }
         public string Location { get; set; }

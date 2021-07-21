@@ -13,7 +13,7 @@ using Microsoft.Extensions.Options;
 
 namespace Calypso.Api.Controllers
 {
-    [Authorize]
+    //[Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class FeedbackController : ControllerBase
@@ -24,7 +24,7 @@ namespace Calypso.Api.Controllers
 
         public FeedbackController(
             IFeedbackRepository feedbackRepository,
-            IFeedbackImageRepository feedbackImageRepository, 
+            IFeedbackImageRepository feedbackImageRepository,
             IPlannerService plannerService)
         {
             _feedbackRepository = feedbackRepository;
@@ -54,12 +54,12 @@ namespace Calypso.Api.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create([FromForm] CreateFeedback req, 
-            [FromServices] IOptions<PlannerOptions> plannerOptions)
+        public async Task<IActionResult> Create([FromForm] CreateFeedback req)
         {
             var feedback = req.Map<Feedback>();
             feedback.RowKey = Guid.NewGuid().ToString();
             feedback.PartitionKey = _feedbackRepository.PartitionKey;
+            feedback.Number = await _feedbackRepository.GetNextNumber();
             if (req.File != null)
             {
                 var fileName = Guid.NewGuid().ToString();
@@ -67,7 +67,7 @@ namespace Calypso.Api.Controllers
                 feedback.FileName = fileName;
             }
             await _feedbackRepository.CreateAsync(feedback);
-            await _plannerService.CreateTask(HttpContext.Request.Headers.GetAuthorizationHeaderValue(), feedback.Subject);
+            await _plannerService.CreateTask(HttpContext.Request.Headers.GetAuthorizationHeaderValue(), $"Feedback #{feedback.Number}");
             return Created("", feedback);
         }
 
@@ -110,7 +110,7 @@ namespace Calypso.Api.Controllers
             if (feedback == null)
                 return NotFound();
             await _feedbackRepository.DeleteAsync(feedback);
-            if(feedback.FileName != null)
+            if (feedback.FileName != null)
                 await _feedbackImageRepository.DeleteImageAsync(feedback.FileName);
             return NoContent();
         }

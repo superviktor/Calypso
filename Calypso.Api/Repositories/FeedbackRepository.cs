@@ -20,8 +20,8 @@ namespace Calypso.Api.Repositories
         {
             var feedbacks = await GetEntitiesAsync();
 
-            var filtered = !string.IsNullOrWhiteSpace(searchString) 
-                ? feedbacks.Where(x => 
+            var filtered = !string.IsNullOrWhiteSpace(searchString)
+                ? feedbacks.Where(x =>
                     (!string.IsNullOrWhiteSpace(x.Subject) && x.Subject.Contains(searchString)) ||
                     (!string.IsNullOrWhiteSpace(x.ProjectName) && x.ProjectName.Contains(searchString)) ||
                     (!string.IsNullOrWhiteSpace(x.Factory.ToString()) && x.Factory.ToString().Contains(searchString)) ||
@@ -30,12 +30,12 @@ namespace Calypso.Api.Repositories
                     (!string.IsNullOrWhiteSpace(x.ProductName) && x.ProductName.Contains(searchString)) ||
                     (!string.IsNullOrWhiteSpace(x.Reporter) && x.Reporter.Contains(searchString)) ||
                     (!string.IsNullOrWhiteSpace(x.Sbu) && x.Sbu.Contains(searchString)) ||
-                    (!string.IsNullOrWhiteSpace(x.Role) && x.Role.Contains(searchString)) 
-                ).ToList() 
+                    (!string.IsNullOrWhiteSpace(x.Role) && x.Role.Contains(searchString))
+                ).ToList()
                 : feedbacks;
 
             var pagedItems = filtered
-                .OrderByDescending(f=>f.Timestamp)
+                .OrderByDescending(f => f.Timestamp)
                 .Skip((pageNumber - 1) * itemsPerPage)
                 .Take(itemsPerPage);
 
@@ -66,6 +66,14 @@ namespace Calypso.Api.Repositories
         public Task DeleteAsync(Feedback feedback)
         {
             return DeleteEntityAsync(feedback);
+        }
+
+        public async Task<int> GetNextNumber()
+        {
+            var feedbacks = await GetEntitiesAsync();
+            if (feedbacks.Count == 0)
+                return 1;
+            return feedbacks.Max(f => f.Number) + 1;
         }
     }
 }

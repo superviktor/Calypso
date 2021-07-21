@@ -12,5 +12,6 @@ namespace Calypso.Api.Repositories
         Task CreateAsync(Feedback feedback);
         Task UpdateAsync(Feedback feedback);
         Task DeleteAsync(Feedback feedback);
+        Task<int> GetNextNumber();
     }
 }

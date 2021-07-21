@@ -9,6 +9,7 @@ namespace Calypso.Api.Models
     {
         public string PartitionKey { get; set; }
         public string RowKey { get; set; }
+        public int Number { get; set; }
         public DateTimeOffset? Timestamp { get; set; }
         public ETag ETag { get; set; }
         public string Subject { get; set; }

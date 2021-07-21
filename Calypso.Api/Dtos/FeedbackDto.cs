@@ -6,6 +6,7 @@ namespace Calypso.Api.Dtos
     public class FeedbackDto
     {
         public string RowKey { get; set; }
+        public int Number { get; set; }
         public string Subject { get; set; }
         public string Machine { get; set; }
         public string Location { get; set; }

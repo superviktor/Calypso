@@ -16,6 +16,7 @@ else
     <table id="items" class="table">
         <thead>
             <tr>
+                <th>Number</th>
                 <th>Subject</th>
                 <th>Machine</th>
                 <th>Location</th>
@@ -33,6 +34,7 @@ else
             @foreach (var feedback in _feedbacks)
             {
                 <tr>
+                    <td>@feedback.Number</td>
                     <td>@feedback.Subject</td>
                     <td>@feedback.Machine</td>
                     <td>@feedback.Location</td>
