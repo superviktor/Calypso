@@ -13,7 +13,7 @@ using Microsoft.Extensions.Options;
 
 namespace Calypso.Api.Controllers
 {
-    //[Authorize]
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class FeedbackController : ControllerBase
@@ -62,15 +62,16 @@ namespace Calypso.Api.Controllers
             feedback.Number = await _feedbackRepository.GetNextNumber();
             if (req.File != null)
             {
-                var fileName = Guid.NewGuid().ToString();
+                var fileName = $"{Guid.NewGuid()}.jpg";
                 await _feedbackImageRepository.UploadImageAsync(fileName, await req.File.ToStreamAsync());
                 feedback.FileName = fileName;
             }
             await _feedbackRepository.CreateAsync(feedback);
             var authorizationHeaderValue = HttpContext.Request.Headers.GetAuthorizationHeaderValue();
             var taskId = await _plannerService.CreateTask(authorizationHeaderValue, $"Feedback #{feedback.Number}");
-            await _plannerService.AddTaskDescription(authorizationHeaderValue,
-                taskId, feedback.Description);
+            var attachmentUrl = feedback.FileName != null ? await _feedbackImageRepository.GetSharedUrl(feedback.FileName) : null;
+            await _plannerService.AddTaskDetails(authorizationHeaderValue,
+                taskId, feedback.Description, attachmentUrl);
 
             return Created("", feedback);
         }
@@ -98,7 +99,7 @@ namespace Calypso.Api.Controllers
                 //delete existing file
                 await _feedbackImageRepository.DeleteImageAsync(feedback.FileName);
                 //add new file
-                var fileName = Guid.NewGuid().ToString();
+                var fileName = $"{Guid.NewGuid()}.jpg";
                 await _feedbackImageRepository.UploadImageAsync(fileName, await req.File.ToStreamAsync());
                 feedback.FileName = fileName;
             }

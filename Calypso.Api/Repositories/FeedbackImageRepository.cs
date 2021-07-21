@@ -27,5 +27,10 @@ namespace Calypso.Api.Repositories
         {
             return DeleteAsync(name);
         }
+
+        public Task<string> GetSharedUrl(string name)
+        {
+            return GetSharedUrlWithSas(name);
+        }
     }
 }

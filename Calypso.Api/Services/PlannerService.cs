@@ -34,17 +34,22 @@ namespace Calypso.Api.Services
                 });
             return task.Id;
         }
-        public async Task AddTaskDescription(string authToken, string taskId, string description)
+        public async Task AddTaskDetails(string authToken, string taskId, string description, string attachmentUrl = null)
         {
             var graphServiceClient = await GetGraphServiceClient(authToken);
             var taskDetails = await graphServiceClient.Planner.Tasks[taskId].Details.Request()
                 .GetAsync();
+            var plannerTaskDetailsToUpdate = new PlannerTaskDetails
+            {
+                Description = description,
+                References = new PlannerExternalReferences()
+            };
+            if(attachmentUrl != null)
+                plannerTaskDetailsToUpdate.References.AddReference(attachmentUrl, "attachment.jpg");
+
             await graphServiceClient.Planner.Tasks[taskId].Details.Request()
                 .Header("If-Match", taskDetails.GetEtag())
-                .UpdateAsync(new PlannerTaskDetails
-                {
-                    Description = description
-                });
+                .UpdateAsync(plannerTaskDetailsToUpdate);
         }
 
         private async Task<GraphServiceClient> GetGraphServiceClient(string authToken)

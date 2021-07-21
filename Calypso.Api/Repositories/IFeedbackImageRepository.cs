@@ -8,5 +8,6 @@ namespace Calypso.Api.Repositories
         Task UploadImageAsync(string name, Stream content);
         Task<Stream> DownloadImageAsync(string name);
         Task DeleteImageAsync(string name);
+        Task<string> GetSharedUrl(string name);
     }
 }

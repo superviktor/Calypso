@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using Calypso.Api.Enums;
+using Calypso.Api.Utils;
 using Microsoft.AspNetCore.Http;
 
 namespace Calypso.Api.Dtos
@@ -30,6 +31,8 @@ namespace Calypso.Api.Dtos
         public string ProductName { get; set; }
         [Required]
         public Factory Factory { get; set; }
+        [MaxFileSize(1 * 1024 * 1024)]
+        [AllowedExtensions(new string[] { ".jpg" })]
         public IFormFile File { get; set; }
     }
 }
