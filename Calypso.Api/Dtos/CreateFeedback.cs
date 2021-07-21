@@ -32,7 +32,7 @@ namespace Calypso.Api.Dtos
         [Required]
         public Factory Factory { get; set; }
         [MaxFileSize(1 * 1024 * 1024)]
-        [AllowedExtensions(new string[] { ".jpg" })]
+        [AllowedExtensions(new [] { ".jpg" })]
         public IFormFile File { get; set; }
     }
 }

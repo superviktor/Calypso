@@ -22,16 +22,16 @@ namespace Calypso.Api.Utils
                 var extension = Path.GetExtension(file.FileName);
                 if (!_extensions.Contains(extension.ToLower()))
                 {
-                    return new ValidationResult(GetErrorMessage());
+                    return new ValidationResult(GetErrorMessage(extension));
                 }
             }
 
             return ValidationResult.Success;
         }
 
-        public string GetErrorMessage()
+        public string GetErrorMessage(string extension)
         {
-            return "This extension is not allowed!";
+            return $"Extension {extension} is not allowed!";
         }
     }
 }

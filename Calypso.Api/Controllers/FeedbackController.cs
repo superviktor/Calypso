@@ -13,7 +13,7 @@ using Microsoft.Extensions.Options;
 
 namespace Calypso.Api.Controllers
 {
-    [Authorize]
+    //[Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class FeedbackController : ControllerBase
