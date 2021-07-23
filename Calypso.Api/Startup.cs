@@ -72,7 +72,7 @@ namespace Calypso.Api
             services.Configure<AzureStorageOptions>(azureStorageSection);
             services.AddScoped<IFeedbackRepository, FeedbackRepository>();
             services.AddScoped<IFeedbackImageRepository, FeedbackImageRepository>();
-            services.AddScoped<IPlannerService, PlannerService>();
+            services.AddScoped<ITeamsIntegrationService, TeamsIntegrationService>();
 
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
                 .AddMicrosoftIdentityWebApi(Configuration, "AzureAd");
@@ -81,6 +81,8 @@ namespace Calypso.Api
                 AzureAdOptions.AzureAd));
             services.Configure<PlannerOptions>(Configuration.GetSection(
                 PlannerOptions.Planner));
+            services.Configure<TeamOptions>(Configuration.GetSection(
+                TeamOptions.Team));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

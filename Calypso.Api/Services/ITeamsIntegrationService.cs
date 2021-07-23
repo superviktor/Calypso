@@ -2,9 +2,10 @@
 
 namespace Calypso.Api.Services
 {
-    public interface IPlannerService
+    public interface ITeamsIntegrationService
     {
         Task<string> CreateTask(string authToken, string title);
         Task AddTaskDetails(string authToken, string taskId, string description, string attachmentUrl = null);
+        Task SendChannelMessage(string authToken, string taskTitle);
     }
 }

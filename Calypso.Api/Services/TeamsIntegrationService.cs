@@ -8,23 +8,28 @@ using Microsoft.Identity.Client;
 
 namespace Calypso.Api.Services
 {
-    public class PlannerService : IPlannerService
+    public class TeamsIntegrationService : ITeamsIntegrationService
     {
-        private const string PlannerScope = "https://graph.microsoft.com/Tasks.ReadWrite";
+        private const string TaskReadWriteScope = "https://graph.microsoft.com/Tasks.ReadWrite";
+        private const string ChannelMessageSendScope = "https://graph.microsoft.com/ChannelMessage.Send";
         private const string UserAssertionType = "urn:ietf:params:oauth:grant-type:jwt-bearer";
 
         private readonly IOptions<AzureAdOptions> _azureAdOptions;
         private readonly IOptions<PlannerOptions> _plannerOptions;
+        private readonly IOptions<TeamOptions> _teamOptions;
 
-        public PlannerService(IOptions<AzureAdOptions> azureAdOptions, IOptions<PlannerOptions> plannerOptions)
+        public TeamsIntegrationService(IOptions<AzureAdOptions> azureAdOptions,
+            IOptions<PlannerOptions> plannerOptions,
+            IOptions<TeamOptions> teamOptions)
         {
             _azureAdOptions = azureAdOptions;
             _plannerOptions = plannerOptions;
+            _teamOptions = teamOptions;
         }
 
         public async Task<string> CreateTask(string authToken, string title)
         {
-            var graphServiceClient = await GetGraphServiceClient(authToken);
+            var graphServiceClient = await GetGraphServiceClient(authToken, TaskReadWriteScope);
             var task = await graphServiceClient.Planner.Tasks.Request()
                 .AddAsync(new PlannerTask
                 {
@@ -34,17 +39,18 @@ namespace Calypso.Api.Services
                 });
             return task.Id;
         }
+
         public async Task AddTaskDetails(string authToken, string taskId, string description, string attachmentUrl = null)
         {
-            var graphServiceClient = await GetGraphServiceClient(authToken);
+            var graphServiceClient = await GetGraphServiceClient(authToken, TaskReadWriteScope);
             var taskDetails = await graphServiceClient.Planner.Tasks[taskId].Details.Request()
-                .GetAsync();
+               .GetAsync();
             var plannerTaskDetailsToUpdate = new PlannerTaskDetails
             {
                 Description = description,
                 References = new PlannerExternalReferences()
             };
-            if(attachmentUrl != null)
+            if (attachmentUrl != null)
                 plannerTaskDetailsToUpdate.References.AddReference(attachmentUrl, "attachment.jpg");
 
             await graphServiceClient.Planner.Tasks[taskId].Details.Request()
@@ -52,9 +58,25 @@ namespace Calypso.Api.Services
                 .UpdateAsync(plannerTaskDetailsToUpdate);
         }
 
-        private async Task<GraphServiceClient> GetGraphServiceClient(string authToken)
+        public async Task SendChannelMessage(string authToken, string taskTitle)
         {
-            var scopes = new List<string> {PlannerScope};
+            var graphServiceClient = await GetGraphServiceClient(authToken, ChannelMessageSendScope);
+            var chatMessage = new ChatMessage
+            {
+                Body = new ItemBody
+                {
+                    Content = $"Task {taskTitle} created"
+                }
+            };
+
+            await graphServiceClient.Teams[_teamOptions.Value.TeamId].Channels[_teamOptions.Value.ChannelId].Messages
+                .Request()
+                .AddAsync(chatMessage);
+        }
+
+        private async Task<GraphServiceClient> GetGraphServiceClient(string authToken, string scope)
+        {
+            var scopes = new List<string> { scope };
             var userAssertion = new UserAssertion(authToken, UserAssertionType);
             var confidentialClientApplication = ConfidentialClientApplicationBuilder
                 .Create(_azureAdOptions.Value.ClientId)

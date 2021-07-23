@@ -20,16 +20,16 @@ namespace Calypso.Api.Controllers
     {
         private readonly IFeedbackRepository _feedbackRepository;
         private readonly IFeedbackImageRepository _feedbackImageRepository;
-        private readonly IPlannerService _plannerService;
+        private readonly ITeamsIntegrationService _teamsIntegrationService;
 
         public FeedbackController(
             IFeedbackRepository feedbackRepository,
             IFeedbackImageRepository feedbackImageRepository,
-            IPlannerService plannerService)
+            ITeamsIntegrationService teamsIntegrationService)
         {
             _feedbackRepository = feedbackRepository;
             _feedbackImageRepository = feedbackImageRepository;
-            _plannerService = plannerService;
+            _teamsIntegrationService = teamsIntegrationService;
         }
         [HttpGet]
         public async Task<IActionResult> GetPaged(
@@ -68,10 +68,11 @@ namespace Calypso.Api.Controllers
             }
             await _feedbackRepository.CreateAsync(feedback);
             var authorizationHeaderValue = HttpContext.Request.Headers.GetAuthorizationHeaderValue();
-            var taskId = await _plannerService.CreateTask(authorizationHeaderValue, $"Feedback #{feedback.Number}");
+            var title = $"Feedback #{feedback.Number}";
+            var taskId = await _teamsIntegrationService.CreateTask(authorizationHeaderValue, title);
             var attachmentUrl = feedback.FileName != null ? await _feedbackImageRepository.GetSharedUrl(feedback.FileName) : null;
-            await _plannerService.AddTaskDetails(authorizationHeaderValue,
-                taskId, feedback.Description, attachmentUrl);
+            await _teamsIntegrationService.AddTaskDetails(authorizationHeaderValue, taskId, feedback.Description, attachmentUrl);
+            await _teamsIntegrationService.SendChannelMessage(authorizationHeaderValue, title);
 
             return Created("", feedback);
         }
