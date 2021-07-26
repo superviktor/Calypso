@@ -1,9 +1,8 @@
 ﻿using System;
 using Azure;
 using Azure.Data.Tables;
-using Calypso.Api.Enums;
 
-namespace Calypso.Api.Models
+namespace Calypso.FunctionApp.Models
 {
     public class Feedback : ITableEntity
     {
@@ -18,13 +17,13 @@ namespace Calypso.Api.Models
         public string Location { get; set; }
         public string Reporter { get; set; }
         public string Role { get; set; }
-        public DateTime Date { get; set; }
+        public string Date { get; set; }
         public string Sbu { get; set; }
         public string ProjectName { get; set; }
         public string ProductName { get; set; }
-        public Factory Factory { get; set; }
+        public string Factory { get; set; }
         public string FileName { get; set; }
         public string TaskId { get; set; }
-        public Status Status { get; set; }
+        public string Status { get; set; }
     }
 }

@@ -1,8 +1,10 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using Calypso.Api.Common;
 using Calypso.Api.Config;
 using Calypso.Api.Dtos;
+using Calypso.Api.Enums;
 using Calypso.Api.Models;
 using Calypso.Api.Repositories;
 using Calypso.Api.Services;
@@ -38,7 +40,13 @@ namespace Calypso.Api.Controllers
             [FromQuery] string searchString = null)
         {
             var feedbacks = await _feedbackRepository.GetAsync(pageNumber, itemsPerPage, searchString);
-            return Ok(feedbacks);
+            return Ok(new PagedResult<FeedbackDto>
+            {
+                Items = feedbacks.Items.Map<IEnumerable<FeedbackDto>>(),
+                ItemsPerPage = feedbacks.ItemsPerPage,
+                TotalItems = feedbacks.TotalItems,
+                PageNumber = feedbacks.PageNumber
+            });
         }
 
         [HttpGet]
@@ -57,6 +65,7 @@ namespace Calypso.Api.Controllers
         public async Task<IActionResult> Create([FromForm] CreateFeedback req)
         {
             var feedback = req.Map<Feedback>();
+            feedback.Status = Status.New;
             feedback.RowKey = Guid.NewGuid().ToString();
             feedback.PartitionKey = _feedbackRepository.PartitionKey;
             feedback.Number = await _feedbackRepository.GetNextNumber();
@@ -66,13 +75,14 @@ namespace Calypso.Api.Controllers
                 await _feedbackImageRepository.UploadImageAsync(fileName, await req.File.ToStreamAsync());
                 feedback.FileName = fileName;
             }
-            await _feedbackRepository.CreateAsync(feedback);
             var authorizationHeaderValue = HttpContext.Request.Headers.GetAuthorizationHeaderValue();
             var title = $"Feedback #{feedback.Number}";
             var taskId = await _teamsIntegrationService.CreateTask(authorizationHeaderValue, title);
             var attachmentUrl = feedback.FileName != null ? await _feedbackImageRepository.GetSharedUrl(feedback.FileName) : null;
             await _teamsIntegrationService.AddTaskDetails(authorizationHeaderValue, taskId, feedback.Description, attachmentUrl);
             await _teamsIntegrationService.SendChannelMessage(authorizationHeaderValue, title);
+            feedback.TaskId = taskId;
+            await _feedbackRepository.CreateAsync(feedback);
 
             return Created("", feedback);
         }

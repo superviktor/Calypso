@@ -16,5 +16,6 @@
         public string ProductName { get; set; }
         public string Factory { get; set; }
         public string FileName { get; set; }
+        public string Status { get; set; }
     }
 }
