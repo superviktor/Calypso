@@ -1,0 +1,198 @@
+﻿@page "/create"
+@using Microsoft.Extensions.Logging
+@using System.Net.Http.Headers
+@using System.IO
+@using Calypso.TeamsApp.Models
+@inject ILogger<CreateFeedback> Logger
+@inject HttpClient Http
+@inject NavigationManager NavManager
+
+<h1>Create feedback</h1>
+
+<EditForm Model="@createFeedback" OnValidSubmit="@HandleValidSubmit">
+    <DataAnnotationsValidator></DataAnnotationsValidator>
+    <ValidationSummary></ValidationSummary>
+
+    <table>
+        <tr>
+            <td>
+                <label>Description:</label>
+            </td>
+            <td>
+                <InputText @bind-Value="@createFeedback.Description"></InputText>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <label>Subject:</label>
+            </td>
+            <td>
+                <InputText @bind-Value="@createFeedback.Subject"></InputText>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <label>Machine:</label>
+            </td>
+            <td>
+                <InputText @bind-Value="@createFeedback.Machine"></InputText>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <label>Location:</label>
+            </td>
+            <td>
+                <InputText @bind-Value="@createFeedback.Location"></InputText>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <label>Reporter:</label>
+            </td>
+            <td>
+                <InputText @bind-Value="@createFeedback.Reporter"></InputText>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <label>Role:</label>
+            </td>
+            <td>
+                <InputText @bind-Value="@createFeedback.Role"></InputText>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <label>Date:</label>
+            </td>
+            <td>
+                <InputDate @bind-Value="@createFeedback.Date"></InputDate>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <label>Sbu:</label>
+            </td>
+            <td>
+                <InputText @bind-Value="@createFeedback.Sbu"></InputText>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <label>Project name:</label>
+            </td>
+            <td>
+                <InputText @bind-Value="@createFeedback.ProjectName"></InputText>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <label>Product name:</label>
+            </td>
+            <td>
+                <InputText @bind-Value="@createFeedback.ProductName"></InputText>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <label>Factory:</label>
+            </td>
+            <td>
+                <select @bind="@createFeedback.Factory">
+                    <option value="China">China</option>
+                    <option value="Finland">Finland</option>
+                    <option value="India">India</option>
+                    <option value="Russia">Russia</option>
+                    <option value="Usa">Usa</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <label>File:</label>
+            </td>
+            <td>
+                <InputFile OnChange="@LoadFiles"></InputFile>
+            </td>
+        </tr>
+        <tr>
+            <td>
+            </td>
+            <td>
+                <button class="button button1" type="submit">Submit</button>
+            </td>
+        </tr>
+    </table>
+
+</EditForm>
+
+<style>
+    .button {
+        background-color: #4CAF50;
+        border: none;
+        color: white;
+        padding: 16px 32px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        margin: 4px 2px;
+        transition-duration: 0.4s;
+        cursor: pointer;
+    }
+    .button1 {
+        background-color: white;
+        color: black;
+        border: 2px solid #555555;
+    }
+    .button1:hover {
+        background-color: #555555;
+        color: white;
+    }
+</style>
+
+@code
+{
+    private CreateFeedback createFeedback = new();
+    private string fileName;
+
+    private async Task HandleValidSubmit()
+    {
+        using var content = new MultipartFormDataContent
+        {
+            {new StringContent(createFeedback.Description), "Description"},
+            {new StringContent(createFeedback.Subject), "Subject"},
+            {new StringContent(createFeedback.Machine), "Machine"},
+            {new StringContent(createFeedback.Location), "Location"},
+            {new StringContent(createFeedback.Reporter), "Reporter"},
+            {new StringContent(createFeedback.Role), "Role"},
+            {new StringContent(createFeedback.Date.ToShortDateString()), "Date"},
+            {new StringContent(createFeedback.Sbu), "Sbu"},
+            {new StringContent(createFeedback.ProjectName), "ProjectName"},
+            {new StringContent(createFeedback.ProductName), "ProductName"},
+            {new StringContent(createFeedback.Factory), "Factory"}
+        };
+
+        if(createFeedback.FileContent is {Length: > 0 })
+            content.Add(new StreamContent(new MemoryStream(createFeedback.FileContent)), "File", fileName);
+
+        Http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", "eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsIng1dCI6Im5PbzNaRHJPRFhFSzFqS1doWHNsSFJfS1hFZyIsImtpZCI6Im5PbzNaRHJPRFhFSzFqS1doWHNsSFJfS1hFZyJ9.eyJhdWQiOiJhcGk6Ly80Y2U0ZGMwMC1jZGMzLTRkZjgtYmNiYy0xNGUxMDA2NzU4YjEiLCJpc3MiOiJodHRwczovL3N0cy53aW5kb3dzLm5ldC9mNGMxODc4OC0xZjZkLTRmMzQtOTdiMS01MGNlODU0MWE2MzcvIiwiaWF0IjoxNjI3NjM4ODMxLCJuYmYiOjE2Mjc2Mzg4MzEsImV4cCI6MTYyNzY0MjczMSwiYWNyIjoiMSIsImFpbyI6IkUyWmdZS2cxOVZuNXlsV1haYTJ6eUtYVG42ZmxKdjQrWUJITHlPWG80MTNVbitRL0x3RUEiLCJhbXIiOlsicHdkIl0sImFwcGlkIjoiNGNlNGRjMDAtY2RjMy00ZGY4LWJjYmMtMTRlMTAwNjc1OGIxIiwiYXBwaWRhY3IiOiIxIiwiZmFtaWx5X25hbWUiOiJQcnlraGlka28iLCJnaXZlbl9uYW1lIjoiVmlrdG9yIiwiaXBhZGRyIjoiOTMuMTcxLjc4LjIzOCIsIm5hbWUiOiJWaWt0b3IgUHJ5a2hpZGtvIiwib2lkIjoiMzdkYjkzMGEtYmE4MS00YzM2LWFjMzMtMzFjMzU5NWIxZTAzIiwicmgiOiIwLkFTRUFpSWZCOUcwZk5FLVhzVkRPaFVHbU53RGM1RXpEemZoTnZMd1U0UUJuV0xFaEFMRS4iLCJzY3AiOiJhY2Nlc3NfYXNfdXNlciIsInN1YiI6Ilc0YUcxS2FRUjBjb3FnT1RrRlRfSFdmNThQY1FuNUpaR25nT2VhMU83N1EiLCJ0aWQiOiJmNGMxODc4OC0xZjZkLTRmMzQtOTdiMS01MGNlODU0MWE2MzciLCJ1bmlxdWVfbmFtZSI6InZpa3Rvci5wcnlraGlka29Ac29mdHdhcml1bS5uZXQiLCJ1cG4iOiJ2aWt0b3IucHJ5a2hpZGtvQHNvZnR3YXJpdW0ubmV0IiwidXRpIjoiRi1rZFdGZ1hkME9ndHM0Q1Jya1BBQSIsInZlciI6IjEuMCJ9.gLnRmbQ3BeGzS4G4f-S9KP_63WY4ruO5ARFuKiylPOJbRdI5MPhIp-SYYILNTYjkjRkH58MggEtCVzFuekLKQWB4iMAe2eJ3EHZOWtM4AQaa5A1XH7ltEACB1SmWYnkJfFnEHOpZvnjNpxh4NMNgOV2x4o6Y6L1bjaSIrJs_ZwbIgZ1bNnnbGmaVi4XF7m70NVwYdhjygNSsrE9SnJcLvmRoIRjbfhttAe8dqXz8tWEKd7y6ZPf6TxYvactsrbTV6_WrgPYV5bRLHRZ_FpTuaWhdAnPQ4yRW4McYBvQD4Of4UlTaXyirgsJ-pWttzqDQ9haqRC2W1ofvsac02q4cPw");
+        var response = await Http.PostAsync("http://localhost:5000/api/Feedback", content);
+        var responseContent = await response.Content.ReadAsStringAsync();
+        NavManager.NavigateTo("/tab");
+    }
+
+    private async Task LoadFiles(InputFileChangeEventArgs e)
+    {
+        var file = e.GetMultipleFiles().FirstOrDefault();
+
+        if (file != null)
+        {
+            fileName = file.Name;
+            var buffer = new byte[file.Size];
+            await file.OpenReadStream().ReadAsync(buffer);
+            createFeedback.FileContent = buffer;
+        }
+    }
+}

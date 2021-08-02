@@ -1,32 +1,42 @@
 {
   "$schema": "https://developer.microsoft.com/en-us/json-schemas/teams/v1.9/MicrosoftTeams.schema.json",
-  "version": "{version}",
   "manifestVersion": "1.9",
-  "id": "{appid}",
+  "version": "1.0.0",
+  "id": "ef0425d8-7f03-4865-9a44-5de94322e15e",
   "packageName": "com.company.example",
+  "developer": {
+    "name": "JigurdaInc",
+    "websiteUrl": "https://localhost:44357",
+    "privacyUrl": "https://localhost:44357/privacy",
+    "termsOfUseUrl": "https://localhost:44357/termsofuse"
+  },
+  "icons": {
+    "color": "../color.png",
+    "outline": "../outline.png"
+  },
   "name": {
     "short": "FeedbackLoop",
     "full": "FeedbackLoop"
-  },
-  "developer": {
-    "name": "JigurdaInc",
-    "mpnId": "",
-    "websiteUrl": "{baseUrl}",
-    "privacyUrl": "{baseUrl}/privacy",
-    "termsOfUseUrl": "{baseUrl}/termsofuse"
   },
   "description": {
     "short": "Short description for FeedbackLoop.",
     "full": "Full description of FeedbackLoop."
   },
-  "icons": {
-    "outline": "../outline.png",
-    "color": "../color.png"
+  "webApplicationInfo": {
+    "id": "ba9eed5f-8a7e-4a13-befe-dfc4e0451367",
+    "resource": "api://localhost/ba9eed5f-8a7e-4a13-befe-dfc4e0451367"
   },
   "accentColor": "#FFFFFF",
+  "permissions": [
+    "identity",
+    "messageTeamMembers"
+  ],
+  "validDomains": [
+    "localhost"
+  ],
   "configurableTabs": [
     {
-      "configurationUrl": "{baseUrl}/config",
+      "configurationUrl": "https://localhost:44357/config",
       "canUpdateConfiguration": true,
       "scopes": [
         "team",
@@ -38,22 +48,11 @@
     {
       "entityId": "index",
       "name": "Personal Tab",
-      "contentUrl": "{baseUrl}/tab",
-      "websiteUrl": "{baseUrl}/tab",
+      "contentUrl": "https://localhost:44357/tab",
+      "websiteUrl": "https://localhost:44357/tab",
       "scopes": [
         "personal"
       ]
     }
-  ],
-  "validDomains": [
-    "{frontEndDomain}"
-  ],
-  "permissions": [
-    "identity",
-    "messageTeamMembers"
-  ],
-  "webApplicationInfo": {
-    "id": "{appClientId}",
-    "resource": "api://{frontEndDomain}/{appClientId}"
-  }
+  ]
 }
