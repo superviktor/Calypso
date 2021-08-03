@@ -18,13 +18,12 @@
     },
     "Calypso.TeamsApp": {
       "commandName": "Project",
-      "dotnetRunMessages": "true",
-      "launchBrowser": true,
       "launchUrl": "https://teams.microsoft.com/_#/l/app/ef0425d8-7f03-4865-9a44-5de94322e15e?installAppPackage=true",
-      "applicationUrl": "https://localhost:44357;http://localhost:50086",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
-      }
+      },
+      "dotnetRunMessages": "true",
+      "applicationUrl": "https://localhost:44357;http://localhost:50086"
     }
   }
 }

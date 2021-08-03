@@ -1,33 +1,11 @@
 ﻿@page "/tab"
 @using Microsoft.Extensions.Configuration
-@using System.IO
 @using System.Text.Json
 @using Calypso.TeamsApp.Models
 @inject IConfiguration Configuration
 @inject IJSRuntime jsRuntime
 @inject HttpClient Http
 @inject NavigationManager NavManager
-@*<div class="welcome page">
-        <div class="narrow page-padding">
-            <img src="hello.png" />
-            <h1 class="center">
-                Congratulations@(!String.IsNullOrEmpty(UserName) ? ", " + UserName : "")!
-            </h1>
-            @if (!IsLoading)
-            {
-            }
-            else if (IsLoading)
-            {
-                <FluentProgressRing class="center" />
-            }
-
-            <div class="sections">
-
-            </div>
-
-        </div>
-    </div>*@
-
 
 <h1>Feedbacks</h1>
 
@@ -112,55 +90,43 @@ else
             }
     </style>
 }
+
 @code {
-    //TeamsFx teamsfx;
-    //string _clientId, _endpoint;
+    TeamsFx teamsfx;
+    string _clientId, _endpoint;
 
-    //public string UserName { get; set; }
-    //public string Email { get; set; }
-    //public string Title { get; set; }
-    //public string UserPhotoUri { get; set; }
-    //public bool IsLoading { get; set; }
+    private IEnumerable<Feedback> _feedbacks;
 
-    //protected override async Task OnAfterRenderAsync(bool firstRender)
-    //{
-    //    try
-    //    {
-    //        if (firstRender)
-    //        {
-    //            teamsfx = await TeamsFx.CreateTeamsFx(jsRuntime);
-    //            _clientId = Configuration.GetValue<string>("CLIENT_ID");
-    //            _endpoint = NavManager.BaseUri;
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        try
+        {
+            if (firstRender)
+            {
+                teamsfx = await TeamsFx.CreateTeamsFx(jsRuntime);
+                _clientId = Configuration.GetValue<string>("CLIENT_ID");
+                _endpoint = NavManager.BaseUri;
 
-    //            await teamsfx.Init(_clientId, _endpoint, _endpoint);
+                await teamsfx.Init(_clientId, _endpoint, _endpoint);
 
-    //            var user = await teamsfx.GetInfoAsync();
+                var requestUri = new Uri("http://localhost:5000/api/Feedback?pageNumber=1&itemsPerPage=10");
+                var response = await Http.GetAsync(requestUri);
+                var content = await response.Content.ReadAsStringAsync();
+                var pagedResult = JsonSerializer.Deserialize<PagedResult>(content, new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                });
+                _feedbacks = pagedResult.Items;
 
-    //            UserName = user.DisplayName;
-
-    //            StateHasChanged();
-    //        }
-    //    }
-    //    catch (Exception) { }
-    //}
+                StateHasChanged();
+            }
+        }
+        catch (Exception) { }
+    }
 
 
     private void Details(string rowKey)
     {
         NavManager.NavigateTo($"/feedback/{rowKey}");
-    }
-
-    private IEnumerable<Feedback> _feedbacks;
-
-    protected override async Task OnInitializedAsync()
-    {
-        var requestUri = new Uri("http://localhost:5000/api/Feedback?pageNumber=1&itemsPerPage=10");
-        var response = await Http.GetAsync(requestUri);
-        var content = await response.Content.ReadAsStringAsync();
-        var pagedResult = JsonSerializer.Deserialize<PagedResult>(content, new JsonSerializerOptions
-        {
-            PropertyNameCaseInsensitive = true
-        });
-        _feedbacks = pagedResult.Items;
     }
 }
