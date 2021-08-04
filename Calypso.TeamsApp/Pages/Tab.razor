@@ -7,7 +7,19 @@
 @inject HttpClient Http
 @inject NavigationManager NavManager
 
-<h1>Feedbacks</h1>
+<table>
+    <tr>
+        <td>
+            <h1>Feedbacks</h1>
+        </td>
+        <td>-----------------</td>
+        <td>
+            <button @onclick="@(_=> Create())">
+                Create
+            </button>
+        </td>
+    </tr>
+</table>
 
 @if (_feedbacks == null)
 {
@@ -128,5 +140,10 @@ else
     private void Details(string rowKey)
     {
         NavManager.NavigateTo($"/feedback/{rowKey}");
+    }
+
+    private void Create()
+    {
+        NavManager.NavigateTo("/create");
     }
 }
