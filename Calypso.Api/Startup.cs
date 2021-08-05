@@ -1,3 +1,4 @@
+using System;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -63,7 +64,7 @@ namespace Calypso.Api
                                 Id = "Bearer"
                             }
                         },
-                        new string[] { }
+                        Array.Empty<string>()
                     }
                 });
             });
@@ -80,13 +81,13 @@ namespace Calypso.Api
             services.Configure<AzureAdOptions>(Configuration.GetSection(
                 AzureAdOptions.AzureAd));
             services.Configure<PlannerOptions>(Configuration.GetSection(
-                PlannerOptions.Planner));
+                PlannerOptions.OptionName));
             services.Configure<TeamOptions>(Configuration.GetSection(
-                TeamOptions.Team));
+                TeamOptions.OptionName));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public void Configure(IApplicationBuilder app)
         {
 
             app.UseDeveloperExceptionPage();

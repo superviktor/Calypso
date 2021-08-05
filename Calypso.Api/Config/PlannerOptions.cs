@@ -2,8 +2,8 @@
 {
     public class PlannerOptions
     {
-        public const string Planner = "Planner";
+        public const string OptionName = "Planner";
 
-        public string PlanId { get; set; }
+        public string Plan { get; set; }
     }
 }

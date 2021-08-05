@@ -2,9 +2,9 @@
 {
     public class TeamOptions
     {
-        public const string Team = "Team";
+        public const string OptionName = "Team";
 
-        public string TeamId { get; set; }
-        public string ChannelId { get; set; }
+        public string Team { get; set; }
+        public string Channel { get; set; }
     }
 }
