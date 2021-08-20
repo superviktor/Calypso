@@ -1,0 +1,29 @@
+{
+  "iisSettings": {
+    "windowsAuthentication": false,
+    "anonymousAuthentication": true,
+    "iisExpress": {
+      "applicationUrl": "http://localhost:50086",
+      "sslPort": 44357
+    }
+  },
+  "profiles": {
+    "IIS Express": {
+      "commandName": "IISExpress",
+      "launchBrowser": true,
+      "launchUrl": "https://teams.microsoft.com/_#/l/app/c6911a47-ba0c-4a69-a94e-5a41900135e9?installAppPackage=true",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      }
+    },
+    "Calypso.TeamsApp123": {
+      "commandName": "Project",
+      "launchUrl": "https://teams.microsoft.com/_#/l/app/c6911a47-ba0c-4a69-a94e-5a41900135e9?installAppPackage=true",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "dotnetRunMessages": "true",
+      "applicationUrl": "https://localhost:44357;http://localhost:50086"
+    }
+  }
+}

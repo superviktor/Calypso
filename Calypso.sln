@@ -9,7 +9,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Calypso.Web", "Calypso.Web\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Calypso.FunctionApp", "Calypso.FunctionApp\Calypso.FunctionApp.csproj", "{1A4FDB5D-99D6-449B-BB30-C9185799B436}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Calypso.TeamsApp", "Calypso.TeamsApp\Calypso.TeamsApp.csproj", "{C2F45F6C-04B2-4957-B50E-901A5DF8D6BD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Calypso.TeamsApp", "Calypso.TeamsApp\Calypso.TeamsApp.csproj", "{C2F45F6C-04B2-4957-B50E-901A5DF8D6BD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Calypso.TeamsApp123", "Calypso.TeamsApp123\Calypso.TeamsApp123.csproj", "{87C159D4-B68E-4EBB-BAAB-7A4568790F5B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{C2F45F6C-04B2-4957-B50E-901A5DF8D6BD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C2F45F6C-04B2-4957-B50E-901A5DF8D6BD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C2F45F6C-04B2-4957-B50E-901A5DF8D6BD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{87C159D4-B68E-4EBB-BAAB-7A4568790F5B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{87C159D4-B68E-4EBB-BAAB-7A4568790F5B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{87C159D4-B68E-4EBB-BAAB-7A4568790F5B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{87C159D4-B68E-4EBB-BAAB-7A4568790F5B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
