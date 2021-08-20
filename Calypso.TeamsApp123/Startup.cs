@@ -1,3 +1,7 @@
+using Calypso.TeamsApp123.Common;
+using Calypso.TeamsApp123.Config;
+using Calypso.TeamsApp123.Repositories;
+using Calypso.TeamsApp123.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -30,6 +34,16 @@ namespace Calypso.TeamsApp123
             services.AddHttpContextAccessor();
 
             services.AddHttpClient("LocalApi", client => client.BaseAddress = new Uri("https://localhost:44357"));
+           
+            var azureStorageSection = Configuration.GetSection("Dependencies:AzureStorage");
+            services.Configure<AzureStorageOptions>(azureStorageSection);
+            services.AddScoped<IFeedbackRepository, FeedbackRepository>();
+            services.AddScoped<IFeedbackImageRepository, FeedbackImageRepository>();
+            services.AddScoped<ITeamsIntegrationService, TeamsIntegrationService>();
+            services.Configure<PlannerOptions>(Configuration.GetSection(
+                PlannerOptions.OptionName));
+            services.Configure<TeamOptions>(Configuration.GetSection(
+                TeamOptions.OptionName));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

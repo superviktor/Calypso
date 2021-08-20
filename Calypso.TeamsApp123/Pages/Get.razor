@@ -1,0 +1,157 @@
+﻿@page "/feedback/{rowKey}"
+@using System.Text.Json
+@using Calypso.TeamsApp123.Dtos
+@using Microsoft.Extensions.Logging
+@inject HttpClient Http
+@inject ILogger<Get> Logger
+@inject NavigationManager NavManager
+
+<h1>Details</h1>
+
+@if (_feedback == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table>
+        <tr>
+            <td>
+                <table>
+                    <tr>
+                        <td>
+                            Description:
+                        </td>
+                        <td>
+                            @_feedback.Description
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Subject:
+                        </td>
+                        <td>
+                            @_feedback.Subject
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Machine:
+                        </td>
+                        <td>
+                            @_feedback.Machine
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Location:
+                        </td>
+                        <td>
+                            @_feedback.Location
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Reporter:
+                        </td>
+                        <td>
+                            @_feedback.Reporter
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Role:
+                        </td>
+                        <td>
+                            @_feedback.Role
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Date:
+                        </td>
+                        <td>
+                            @_feedback.Date
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Sbu:
+                        </td>
+                        <td>
+                            @_feedback.Sbu
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Project name:
+                        </td>
+                        <td>
+                            @_feedback.ProjectName
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Product name:
+                        </td>
+                        <td>
+                            @_feedback.ProductName
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            Factory:
+                        </td>
+                        <td>
+                            @_feedback.Factory
+                        </td>
+                    </tr>
+                </table>
+            </td>
+            <td>
+                <img src="data:image/png;base64, @_image" />
+            </td>
+            <td>
+                <button @onclick="@(_=> Back())">
+                    Back
+                </button>
+            </td>
+        </tr>
+    </table>
+
+}
+
+@code {
+    private FeedbackDto _feedback;
+    private string _image;
+
+    [Parameter]
+    public string RowKey { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var requestUri = new Uri($"https://localhost:44357/api/Feedback/{RowKey}");
+        var response = await Http.GetAsync(requestUri);
+        var content = await response.Content.ReadAsStringAsync();
+        var feedback = JsonSerializer.Deserialize<FeedbackDto>(content, new JsonSerializerOptions
+        {
+            PropertyNameCaseInsensitive = true
+        });
+        _feedback = feedback;
+        _image = await GetImage(feedback.FileName);
+    }
+
+    private async Task<string> GetImage(string imageId)
+    {
+        var requestUri = new Uri($"https://localhost:44357/api/FeedbackImage/{imageId}");
+        var response = await Http.GetAsync(requestUri);
+        var content = await response.Content.ReadAsByteArrayAsync();
+        var base64String = Convert.ToBase64String(content);
+        return base64String;
+    }
+
+    private void Back()
+    {
+        NavManager.NavigateTo("/tab");
+    }
+}

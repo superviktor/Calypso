@@ -1,0 +1,227 @@
+﻿@page "/create"
+@using Calypso.Web.Models
+@using Microsoft.Extensions.Logging
+@using System.Net.Http.Headers
+@using System.IO
+@using Microsoft.Extensions.Configuration
+@inject IConfiguration Configuration
+@inject IJSRuntime jsRuntime
+@inject ILogger<CreateFeedbackDto> Logger
+@inject HttpClient Http
+@inject NavigationManager NavManager
+
+<h1>Create feedback</h1>
+
+<EditForm Model="@createFeedback" OnValidSubmit="@HandleValidSubmit">
+    <DataAnnotationsValidator></DataAnnotationsValidator>
+    <ValidationSummary></ValidationSummary>
+
+    <table>
+        <tr>
+            <td>
+                <label>Description:</label>
+            </td>
+            <td>
+                <InputText @bind-Value="@createFeedback.Description"></InputText>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <label>Subject:</label>
+            </td>
+            <td>
+                <InputText @bind-Value="@createFeedback.Subject"></InputText>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <label>Machine:</label>
+            </td>
+            <td>
+                <InputText @bind-Value="@createFeedback.Machine"></InputText>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <label>Location:</label>
+            </td>
+            <td>
+                <InputText @bind-Value="@createFeedback.Location"></InputText>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <label>Reporter:</label>
+            </td>
+            <td>
+                <InputText @bind-Value="@createFeedback.Reporter"></InputText>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <label>Role:</label>
+            </td>
+            <td>
+                <InputText @bind-Value="@createFeedback.Role"></InputText>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <label>Date:</label>
+            </td>
+            <td>
+                <InputDate @bind-Value="@createFeedback.Date"></InputDate>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <label>Sbu:</label>
+            </td>
+            <td>
+                <InputText @bind-Value="@createFeedback.Sbu"></InputText>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <label>Project name:</label>
+            </td>
+            <td>
+                <InputText @bind-Value="@createFeedback.ProjectName"></InputText>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <label>Product name:</label>
+            </td>
+            <td>
+                <InputText @bind-Value="@createFeedback.ProductName"></InputText>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <label>Factory:</label>
+            </td>
+            <td>
+                <select @bind="@createFeedback.Factory">
+                    <option value="China">China</option>
+                    <option value="Finland">Finland</option>
+                    <option value="India">India</option>
+                    <option value="Russia">Russia</option>
+                    <option value="Usa">Usa</option>
+                </select>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <label>File:</label>
+            </td>
+            <td>
+                <InputFile OnChange="@LoadFiles"></InputFile>
+            </td>
+        </tr>
+        <tr>
+            <td>
+            </td>
+            <td>
+                <button class="button button1" type="submit">Submit</button>
+            </td>
+        </tr>
+    </table>
+
+</EditForm>
+
+<style>
+    .button {
+        background-color: #4CAF50;
+        border: none;
+        color: white;
+        padding: 16px 32px;
+        text-align: center;
+        text-decoration: none;
+        display: inline-block;
+        font-size: 16px;
+        margin: 4px 2px;
+        transition-duration: 0.4s;
+        cursor: pointer;
+    }
+
+    .button1 {
+        background-color: white;
+        color: black;
+        border: 2px solid #555555;
+    }
+
+        .button1:hover {
+            background-color: #555555;
+            color: white;
+        }
+</style>
+
+@code
+{
+    TeamsFx teamsfx;
+    string _clientId, _endpoint;
+
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        try
+        {
+            if (firstRender)
+            {
+                teamsfx = await TeamsFx.CreateTeamsFx(jsRuntime);
+                _clientId = Configuration.GetValue<string>("CLIENT_ID");
+                _endpoint = NavManager.BaseUri;
+
+                await teamsfx.Init(_clientId, _endpoint, _endpoint);
+
+                StateHasChanged();
+            }
+        }
+        catch (Exception) { }
+    }
+
+
+    private CreateFeedbackDto createFeedback = new();
+    private string fileName;
+
+    private async Task HandleValidSubmit()
+    {
+        using var content = new MultipartFormDataContent
+    {
+            {new StringContent(createFeedback.Description), "Description"},
+            {new StringContent(createFeedback.Subject), "Subject"},
+            {new StringContent(createFeedback.Machine), "Machine"},
+            {new StringContent(createFeedback.Location), "Location"},
+            {new StringContent(createFeedback.Reporter), "Reporter"},
+            {new StringContent(createFeedback.Role), "Role"},
+            {new StringContent(createFeedback.Date.ToShortDateString()), "Date"},
+            {new StringContent(createFeedback.Sbu), "Sbu"},
+            {new StringContent(createFeedback.ProjectName), "ProjectName"},
+            {new StringContent(createFeedback.ProductName), "ProductName"},
+            {new StringContent(createFeedback.Factory), "Factory"}
+        };
+
+        if (createFeedback.FileContent is { Length: > 0 })
+            content.Add(new StreamContent(new MemoryStream(createFeedback.FileContent)), "File", fileName);
+
+        var token = await teamsfx.GetAuthenticationToken();
+        Http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token.Token);
+        var response = await Http.PostAsync("https://localhost:44357/api/Feedback", content);
+        var responseContent = await response.Content.ReadAsStringAsync();
+        NavManager.NavigateTo("/tab");
+    }
+
+    private async Task LoadFiles(InputFileChangeEventArgs e)
+    {
+        var file = e.GetMultipleFiles().FirstOrDefault();
+
+        if (file != null)
+        {
+            fileName = file.Name;
+            var buffer = new byte[file.Size];
+            await file.OpenReadStream().ReadAsync(buffer);
+            createFeedback.FileContent = buffer;
+        }
+    }
+}
